@@ -1,0 +1,67 @@
+[
+  {
+    "timestamp": "2026-01-18T21:58:58.804421",
+    "predicted": "Active Work",
+    "actual": "Idle",
+    "window_number": 4,
+    "session": 1,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "pycharm64.exe",
+      "app_category": "code_development",
+      "app_durations": {
+        "pycharm64.exe": 1138.2735238075256
+      },
+      "heatmap_cells": 6
+    }
+  },
+  {
+    "timestamp": "2026-01-18T22:00:08.446052",
+    "predicted": "Active Work",
+    "actual": "Idle",
+    "window_number": 5,
+    "session": 1,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "pycharm64.exe",
+      "app_category": "code_development",
+      "app_durations": {
+        "pycharm64.exe": 1198.2698428630829
+      },
+      "heatmap_cells": 11
+    }
+  },
+  {
+    "timestamp": "2026-01-18T22:01:24.062118",
+    "predicted": "Communication",
+    "actual": "Idle",
+    "window_number": 6,
+    "session": 1,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "pycharm64.exe",
+      "app_category": "code_development",
+      "app_durations": {
+        "pycharm64.exe": 1258.1465265750885
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-01-18T22:02:40.594744",
+    "predicted": "Distracted",
+    "actual": "Active Work",
+    "window_number": 7,
+    "session": 1,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "firefox.exe",
+      "app_category": "browser",
+      "app_durations": {
+        "pycharm64.exe": 1275.4035563468933,
+        "firefox.exe": 42.27204394340515
+      },
+      "heatmap_cells": 50
+    }
+  }
+]
