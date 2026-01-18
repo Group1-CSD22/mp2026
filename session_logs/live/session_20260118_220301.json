@@ -1,0 +1,271 @@
+{
+  "user_id": "default_user",
+  "start_time": "2026-01-18T21:47:57.988960",
+  "end_time": "2026-01-18T22:03:01.592563",
+  "duration_minutes": 15,
+  "total_windows": 12,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-01-18T21:52:58.079557",
+      "predicted": "Idle",
+      "confidence": 0.9975430965423584,
+      "probabilities": {
+        "Deep Work": 1.2447235349100083e-06,
+        "Active Work": 1.0203458259638865e-05,
+        "Research": 2.2539192286785692e-05,
+        "Communication": 0.002422111574560404,
+        "Distracted": 7.978349572113075e-07,
+        "Idle": 0.9975430965423584
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 898.9911754131317
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-01-18T21:54:09.415546",
+      "predicted": "Idle",
+      "confidence": 0.9985161423683167,
+      "probabilities": {
+        "Deep Work": 6.912442813700181e-07,
+        "Active Work": 7.368154911091551e-06,
+        "Research": 1.024921948555857e-05,
+        "Communication": 0.0014650950906798244,
+        "Distracted": 4.435686093984259e-07,
+        "Idle": 0.9985161423683167
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 958.9243278503418
+        },
+        "heatmap_cells": 8
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 7,
+      "timestamp": "2026-01-18T21:56:33.383798",
+      "predicted": "Idle",
+      "confidence": 0.9985161423683167,
+      "probabilities": {
+        "Deep Work": 6.912442813700181e-07,
+        "Active Work": 7.368154911091551e-06,
+        "Research": 1.024921948555857e-05,
+        "Communication": 0.0014650957891717553,
+        "Distracted": 4.435682399162033e-07,
+        "Idle": 0.9985161423683167
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 1018.4482614994049
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 8,
+      "timestamp": "2026-01-18T21:57:40.392434",
+      "predicted": "Active Work",
+      "confidence": 0.999883770942688,
+      "probabilities": {
+        "Deep Work": 9.760737157193944e-06,
+        "Active Work": 0.999883770942688,
+        "Research": 2.994763053720817e-05,
+        "Communication": 4.7485704271821305e-05,
+        "Distracted": 2.8792281227651983e-05,
+        "Idle": 2.891864312459802e-07
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 1078.3778290748596
+        },
+        "heatmap_cells": 11
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 9,
+      "timestamp": "2026-01-18T21:58:49.822538",
+      "predicted": "Active Work",
+      "confidence": 0.9999523162841797,
+      "probabilities": {
+        "Deep Work": 4.321274445828749e-06,
+        "Active Work": 0.9999523162841797,
+        "Research": 1.4355509847518988e-05,
+        "Communication": 1.8586182704893872e-05,
+        "Distracted": 1.0492203728063032e-05,
+        "Idle": 5.512002587693132e-08
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 1138.2735238075256
+        },
+        "heatmap_cells": 6
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 10,
+      "timestamp": "2026-01-18T21:59:58.841972",
+      "predicted": "Active Work",
+      "confidence": 0.9996951818466187,
+      "probabilities": {
+        "Deep Work": 9.732217586133629e-05,
+        "Active Work": 0.9996951818466187,
+        "Research": 9.952716209227219e-05,
+        "Communication": 7.28959494153969e-05,
+        "Distracted": 3.4405933547532186e-05,
+        "Idle": 5.566077447838325e-07
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 1198.2698428630829
+        },
+        "heatmap_cells": 11
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 11,
+      "timestamp": "2026-01-18T22:01:08.460683",
+      "predicted": "Communication",
+      "confidence": 0.8566707968711853,
+      "probabilities": {
+        "Deep Work": 0.0023487454745918512,
+        "Active Work": 0.022989315912127495,
+        "Research": 0.002861529588699341,
+        "Communication": 0.8566707968711853,
+        "Distracted": 0.0019734736997634172,
+        "Idle": 0.11315619200468063
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 1258.1465265750885
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 12,
+      "timestamp": "2026-01-18T22:02:24.169223",
+      "predicted": "Distracted",
+      "confidence": 0.8239362835884094,
+      "probabilities": {
+        "Deep Work": 0.0006281793466769159,
+        "Active Work": 0.12975193560123444,
+        "Research": 0.04414457455277443,
+        "Communication": 0.00070307741407305,
+        "Distracted": 0.8239362835884094,
+        "Idle": 0.0008359784260392189
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "firefox.exe",
+        "app_category": "browser",
+        "app_durations": {
+          "pycharm64.exe": 1275.4035563468933,
+          "firefox.exe": 42.27204394340515
+        },
+        "heatmap_cells": 50
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 1,
+    "total_windows": 8,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 4,
+    "by_predicted_state": {
+      "Active Work": {
+        "count": 2,
+        "corrections_to": {
+          "Idle": 2
+        }
+      },
+      "Communication": {
+        "count": 1,
+        "corrections_to": {
+          "Idle": 1
+        }
+      },
+      "Distracted": {
+        "count": 1,
+        "corrections_to": {
+          "Active Work": 1
+        }
+      }
+    },
+    "correction_rate": 0.5
+  }
+}
