@@ -1,6 +1,6 @@
 # Work Monitoring System v3.0 - Complete Guide
 
-## 🎯 System Overview
+##  System Overview
 
 A research-grade work monitoring system with:
 - **6 clear states** (no ambiguous "meeting")
@@ -11,7 +11,7 @@ A research-grade work monitoring system with:
 
 ---
 
-## 🚀 Quick Start (4 Commands)
+##  Quick Start (4 Commands)
 
 ```bash
 # 1. Install dependencies
@@ -32,7 +32,7 @@ python complete_live_monitor.py alice
 
 ---
 
-## 📊 Step-by-Step Guide
+##  Step-by-Step Guide
 
 ### Step 1: Generate Dataset
 
@@ -187,7 +187,7 @@ session_logs/live/
 
 ---
 
-## 🎮 Usage Examples
+##  Usage Examples
 
 ### Basic Usage
 
@@ -225,7 +225,7 @@ Each user gets separate:
 
 ---
 
-## 🔧 Manual Corrections
+##  Manual Corrections
 
 When monitoring, after each prediction:
 
@@ -254,7 +254,7 @@ When monitoring, after each prediction:
 
 ---
 
-## 📊 Understanding the Outputs
+##  Understanding the Outputs
 
 ### User Profile (`user_profiles/alice_profile.pkl`)
 
@@ -295,7 +295,7 @@ Contains:
 
 ---
 
-## 📈 Research Outputs
+##  Research Outputs
 
 ### Figures for Your Paper
 
@@ -341,7 +341,7 @@ All in `research_outputs/figures/`:
 
 ---
 
-## 🎯 6 States Explained
+##  6 States Explained
 
 | State | Description | Key Indicators |
 |-------|-------------|----------------|
@@ -354,7 +354,7 @@ All in `research_outputs/figures/`:
 
 ---
 
-## 🔬 For Your Research Paper
+##  For Your Research Paper
 
 ### Table 1: System Specifications
 
@@ -391,7 +391,7 @@ All in `research_outputs/figures/`:
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### "Dataset not found"
 ```bash
@@ -423,7 +423,7 @@ pip install pynput psutil pywin32
 
 ---
 
-## 📁 Complete File Structure
+##  Complete File Structure
 
 ```
 work-monitoring-system/
@@ -456,7 +456,7 @@ work-monitoring-system/
 
 ---
 
-## 🎓 Citation
+##  Citation
 
 ```bibtex
 @article{workmonitor2026,
@@ -469,7 +469,7 @@ work-monitoring-system/
 
 ---
 
-## ✅ Final Checklist
+##  Final Checklist
 
 - [x] Dataset generated (30K samples)
 - [x] Model trained (88%+ accuracy)
