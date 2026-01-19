@@ -1,11 +1,12 @@
 """
-REALISTIC DATA GENERATOR (Hard Mode) - FIXED
-- Fixes TypeError in np.random.normal
+REALISTIC DATA GENERATOR (Hard Mode) - FINAL
+- Saves both JSON and CSV
+- Fixed np.random bugs
 - Overlapping feature distributions (no easy separations)
-- High variance to force temporal learning
 """
 
 import numpy as np
+import pandas as pd
 import json
 from pathlib import Path
 from datetime import datetime
@@ -92,14 +93,12 @@ class RealisticDatasetGenerator:
         p = self.profiles[state]
         f = {}
 
-        # Helper to generate normal distribution from (mean, cap, std)
+        # Helper to generate normal distribution
         def get_val(key):
             mean, cap, std = p[key]
-            val = np.random.normal(mean, std)
-            return val  # We rely on specific logic below to clip/max
+            return np.random.normal(mean, std)
 
-        # 1. Base Generators (The "Nerfed" ones)
-        # Using max(0, val) to prevent negative rates
+        # 1. Base Generators
         f['keystroke_rate'] = max(0, get_val('keystroke_rate'))
         f['typing_speed_wpm'] = max(0, get_val('typing_speed_wpm'))
         f['mouse_movement_count'] = max(0, get_val('mouse_movement_count'))
@@ -108,7 +107,7 @@ class RealisticDatasetGenerator:
         f['scroll_rate'] = max(0, get_val('scroll_rate'))
         f['is_idle'] = np.clip(get_val('is_idle'), 0, 1)
 
-        # 2. Derived Features (Adding noise to relationships)
+        # 2. Derived Features
         f['keystroke_count'] = f['keystroke_rate'] * 60
         f['keystroke_variance'] = np.random.uniform(0.01, 0.2)
         f['keystroke_burst_ratio'] = np.random.uniform(0.1, 0.9)
@@ -130,7 +129,6 @@ class RealisticDatasetGenerator:
         f['total_scroll'] = f['scroll_count'] * np.random.uniform(10, 50)
         f['avg_scroll'] = f['total_scroll'] / (f['scroll_count'] + 1)
 
-        # Apps - MAKE THIS UNRELIABLE
         f['app_switch_count'] = np.random.poisson(2) if state in ['deep_work', 'idle'] else np.random.poisson(6)
         f['unique_apps'] = max(1, f['app_switch_count'] // 2)
         f['focus_stability'] = 1.0 / (f['app_switch_count'] + 1)
@@ -176,10 +174,20 @@ class RealisticDatasetGenerator:
         return data
 
     def save(self, data):
-        Path("datasets").mkdir(exist_ok=True)
-        with open("datasets/improved_dataset.json", "w") as f:
+        output_dir = Path("datasets")
+        output_dir.mkdir(exist_ok=True)
+
+        # Save JSON
+        json_path = output_dir / "improved_dataset.json"
+        with open(json_path, "w") as f:
             json.dump(data, f)
-        print("✅ Saved realistic dataset to datasets/improved_dataset.json")
+
+        # Save CSV (Fixed missing functionality)
+        csv_path = output_dir / "improved_dataset.csv"
+        df = pd.DataFrame(data)
+        df.to_csv(csv_path, index=False)
+
+        print(f"✅ Saved realistic dataset to:\n  - {json_path}\n  - {csv_path}")
 
 if __name__ == "__main__":
     gen = RealisticDatasetGenerator()
