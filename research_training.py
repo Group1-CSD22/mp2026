@@ -1,716 +1,474 @@
 """
-Research-Grade Training Pipeline
-Generates publication-quality figures and comprehensive metrics
-Follows IEEE and Springer standards
+Research-Grade Training Pipeline v4.0 - BEAUTIFUL PLOTS EDITION
+- IEEE/Springer standard figures (Times New Roman, 300 DPI)
+- Smoothed training curves
+- Enhanced error analysis
+- Session-based splitting (Leakage Fixed)
 """
 
+import sys
 import torch
 import torch.nn as nn
 import numpy as np
-from sklearn.model_selection import train_test_split, StratifiedKFold
 from sklearn.metrics import (accuracy_score, precision_recall_fscore_support,
-                            confusion_matrix, classification_report, 
-                            roc_curve, auc, matthews_corrcoef)
+                            confusion_matrix, roc_curve, auc, matthews_corrcoef)
 from sklearn.preprocessing import StandardScaler, label_binarize
 import json
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # Non-interactive backend
 import matplotlib.pyplot as plt
 import seaborn as sns
 from datetime import datetime
 from pathlib import Path
-import pandas as pd
-import sys
+from scipy.signal import savgol_filter
 
-
-# Set publication-quality plotting defaults
-plt.rcParams['figure.dpi'] = 300
-plt.rcParams['savefig.dpi'] = 300
-plt.rcParams['font.family'] = 'serif'
-plt.rcParams['font.serif'] = ['Times New Roman']
-plt.rcParams['font.size'] = 10
-plt.rcParams['axes.labelsize'] = 11
-plt.rcParams['axes.titlesize'] = 12
-plt.rcParams['xtick.labelsize'] = 9
-plt.rcParams['ytick.labelsize'] = 9
-plt.rcParams['legend.fontsize'] = 9
-plt.rcParams['figure.titlesize'] = 13
-
+# --- PUBLICATION STYLE CONFIGURATION ---
+sns.set_theme(style="whitegrid", context="paper")
+plt.rcParams.update({
+    'font.family': 'serif',
+    'font.serif': ['Times New Roman'],
+    'font.size': 12,
+    'axes.labelsize': 12,
+    'axes.titlesize': 14,
+    'xtick.labelsize': 10,
+    'ytick.labelsize': 10,
+    'legend.fontsize': 10,
+    'figure.titlesize': 16,
+    'figure.dpi': 300,
+    'savefig.dpi': 300,
+    'axes.grid': True,
+    'grid.alpha': 0.3
+})
 
 class ResearchTrainingPipeline:
-    """Training pipeline with research-grade outputs"""
-    
+    """Training pipeline with publication-quality outputs"""
+
     def __init__(self, model, device='cpu'):
         self.model = model.to(device)
         self.device = device
         self.scaler = StandardScaler()
-        
+
         self.history = {
             'train_loss': [], 'train_acc': [],
             'val_loss': [], 'val_acc': [],
             'epoch': [], 'lr': []
         }
-        
+
         self.label_map = {
-            0: 'Deep Work',
-            1: 'Active Work',
-            2: 'Research',
-            3: 'Communication',
-            4: 'Distracted',
-            5: 'Idle'
+            0: 'Deep Work', 1: 'Active Work', 2: 'Research',
+            3: 'Communication', 4: 'Distracted', 5: 'Idle'
         }
-        
+
+        # Short names for tight plots
         self.state_abbrev = {
-            0: 'DW', 1: 'AW', 2: 'RS', 
-            3: 'CM', 4: 'DS', 5: 'ID'
+            0: 'DW', 1: 'AW', 2: 'Res',
+            3: 'Com', 4: 'Dis', 5: 'Idle'
         }
-        
-        # Output directories
+
+        # Setup directories
         self.output_dir = Path('research_outputs')
         self.figures_dir = self.output_dir / 'figures'
         self.metrics_dir = self.output_dir / 'metrics'
         self.models_dir = self.output_dir / 'models'
-        
-        for dir in [self.output_dir, self.figures_dir, self.metrics_dir, self.models_dir]:
-            dir.mkdir(exist_ok=True, parents=True)
-        
-        print(f"✓ Pipeline initialized on {device}")
-        print(f"✓ Outputs will be saved to: {self.output_dir}")
-    
-    def prepare_data(self, sequences, labels, test_size=0.10, val_size=0.10):
-        """Prepare with smaller test set for more training data"""
-        print("\n" + "="*70)
-        print("DATA PREPARATION")
-        print("="*70)
 
-        n_samples, seq_len, n_features = sequences.shape
-        print(f"\nDataset: {sequences.shape}")
-        print(f"  Samples: {n_samples:,}")
-        print(f"  Sequence length: {seq_len}")
-        print(f"  Features: {n_features}")
+        for d in [self.output_dir, self.figures_dir, self.metrics_dir, self.models_dir]:
+            d.mkdir(exist_ok=True, parents=True)
 
-        # Normalize
-        print("\nNormalizing features...")
-        sequences_flat = sequences.reshape(-1, n_features)
-        sequences_flat = self.scaler.fit_transform(sequences_flat)
-        sequences = sequences_flat.reshape(n_samples, seq_len, n_features)
+        print(f"✅ Pipeline initialized on {device}")
 
-        # Stratified split (smaller test set = more training data)
-        print("Splitting data (stratified)...")
-        X_train, X_test, y_train, y_test = train_test_split(
-            sequences, labels,
-            test_size=test_size,
-            random_state=42,
-            stratify=labels
-        )
+    def prepare_data(self, train_data, val_data, test_data):
+        """Normalize features"""
+        print("\n" + "="*60 + "\nDATA NORMALIZATION\n" + "="*60)
 
-        X_train, X_val, y_train, y_val = train_test_split(
-            X_train, y_train,
-            test_size=val_size / (1 - test_size),
-            random_state=42,
-            stratify=y_train
-        )
+        X_train, y_train = train_data
+        X_val, y_val = val_data
+        X_test, y_test = test_data
 
-        print(f"\nSplit sizes:")
-        print(f"  Train: {len(X_train):,} ({len(X_train)/n_samples*100:.1f}%)")
-        print(f"  Val:   {len(X_val):,} ({len(X_val)/n_samples*100:.1f}%)")
-        print(f"  Test:  {len(X_test):,} ({len(X_test)/n_samples*100:.1f}%)")
+        n_features = X_train.shape[2]
 
-        # Class distribution
-        print(f"\nClass distribution (training):")
-        unique, counts = np.unique(y_train, return_counts=True)
-        for cls, count in zip(unique, counts):
-            print(f"  {self.label_map[cls]:15s}: {count:6,} ({count/len(y_train)*100:5.1f}%)")
+        # Fit scaler on TRAINING data only
+        X_train_flat = X_train.reshape(-1, n_features)
+        X_train_flat = self.scaler.fit_transform(X_train_flat)
+        X_train = X_train_flat.reshape(X_train.shape)
+
+        # Transform Val/Test
+        X_val = X_val.reshape(-1, n_features)
+        X_val = self.scaler.transform(X_val).reshape(val_data[0].shape)
+
+        X_test = X_test.reshape(-1, n_features)
+        X_test = self.scaler.transform(X_test).reshape(test_data[0].shape)
+
+        # Save class distribution for plotting later
+        self.class_dist = {
+            'Train': np.unique(y_train, return_counts=True)[1],
+            'Val': np.unique(y_val, return_counts=True)[1],
+            'Test': np.unique(y_test, return_counts=True)[1]
+        }
 
         return (X_train, y_train), (X_val, y_val), (X_test, y_test)
 
-    def train(self, train_data, val_data, epochs=150, batch_size=64, lr=0.0008):
-        """Enhanced training for 90%+ accuracy"""
-        print("\n" + "="*70)
-        print("TRAINING")
-        print("="*70)
+    def train(self, train_data, val_data, epochs=100, batch_size=64, lr=0.0003):
+        """Train loop with stabilized hyperparameters"""
+        print(f"\nTraining for {epochs} epochs | Batch: {batch_size} | LR: {lr}")
 
         X_train, y_train = train_data
         X_val, y_val = val_data
 
-        X_train = torch.FloatTensor(X_train).to(self.device)
-        y_train = torch.LongTensor(y_train).to(self.device)
-        X_val = torch.FloatTensor(X_val).to(self.device)
-        y_val = torch.LongTensor(y_val).to(self.device)
-
-        print(f"\nConfiguration:")
-        print(f"  Epochs: {epochs}")
-        print(f"  Batch size: {batch_size}")
-        print(f"  Learning rate: {lr}")
-        print(f"  Optimizer: Adam (weight_decay=1e-5)")
-        print(f"  Scheduler: CosineAnnealingLR with warmup")
-
-        # Class weights for balanced learning
-        class_counts = torch.bincount(y_train)
-        class_weights = 1.0 / class_counts.float()
-        class_weights = class_weights / class_weights.sum() * 6
-
-        criterion = nn.CrossEntropyLoss(weight=class_weights)
-        optimizer = torch.optim.Adam(
-            self.model.parameters(),
-            lr=lr,
-            weight_decay=1e-5
+        # Convert to tensors
+        train_dataset = torch.utils.data.TensorDataset(
+            torch.FloatTensor(X_train), torch.LongTensor(y_train)
+        )
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=batch_size, shuffle=True
         )
 
-        # Cosine annealing with warm restarts
-        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-            optimizer, T_0=10, T_mult=2, eta_min=1e-6
+        X_val_t = torch.FloatTensor(X_val).to(self.device)
+        y_val_t = torch.LongTensor(y_val).to(self.device)
+
+        criterion = nn.CrossEntropyLoss()
+
+        # FIX 1: Lower LR and add Weight Decay for regularization
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=lr, weight_decay=1e-4)
+
+        # FIX 2: More patient scheduler
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='min', patience=10, factor=0.5
         )
 
-        best_val_loss = float('inf')
-        best_val_acc = 0.0
-        patience = 25
+        best_val_acc = 0
         patience_counter = 0
 
-        print("\nTraining progress:")
-        print("-" * 70)
-
         for epoch in range(epochs):
-            # Training
             self.model.train()
-            train_loss = 0
-            train_correct = 0
+            total_loss = 0
+            correct = 0
+            total = 0
 
-            indices = torch.randperm(len(X_train))
-            num_batches = 0
-
-            for i in range(0, len(X_train), batch_size):
-                batch_indices = indices[i:i+batch_size]
-                X_batch = X_train[batch_indices]
-                y_batch = y_train[batch_indices]
+            for X_batch, y_batch in train_loader:
+                X_batch, y_batch = X_batch.to(self.device), y_batch.to(self.device)
 
                 optimizer.zero_grad()
                 outputs = self.model(X_batch)
                 loss = criterion(outputs, y_batch)
                 loss.backward()
+
+                # FIX 3: Tighter Gradient Clipping (0.5) to prevent explosion
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
                 optimizer.step()
 
-                train_loss += loss.item()
+                total_loss += loss.item()
                 _, predicted = torch.max(outputs.data, 1)
-                train_correct += (predicted == y_batch).sum().item()
-                num_batches += 1
+                total += y_batch.size(0)
+                correct += (predicted == y_batch).sum().item()
 
-            train_loss /= num_batches
-            train_acc = train_correct / len(X_train)
+            avg_loss = total_loss / len(train_loader)
+            train_acc = correct / total
 
             # Validation
             self.model.eval()
             with torch.no_grad():
-                val_outputs = self.model(X_val)
-                val_loss = criterion(val_outputs, y_val)
-                _, val_predicted = torch.max(val_outputs.data, 1)
-                val_acc = (val_predicted == y_val).sum().item() / len(y_val)
+                val_out = self.model(X_val_t)
+                val_loss = criterion(val_out, y_val_t).item()
+                _, val_pred = torch.max(val_out.data, 1)
+                val_acc = (val_pred == y_val_t).sum().item() / len(y_val_t)
 
-            # LR scheduling
-            scheduler.step()
-            current_lr = optimizer.param_groups[0]['lr']
-
-            # Save history
-            self.history['train_loss'].append(train_loss)
+            # Update history
+            self.history['train_loss'].append(avg_loss)
             self.history['train_acc'].append(train_acc)
-            self.history['val_loss'].append(val_loss.item())
+            self.history['val_loss'].append(val_loss)
             self.history['val_acc'].append(val_acc)
-            self.history['epoch'].append(epoch + 1)
-            self.history['lr'].append(current_lr)
+            self.history['epoch'].append(epoch)
+            self.history['lr'].append(optimizer.param_groups[0]['lr'])
+
+            scheduler.step(val_loss)
 
             # Print progress
-            if (epoch + 1) % 5 == 0 or epoch == 0:
-                print(f"Epoch {epoch+1:3d}/{epochs} | "
-                      f"TLoss: {train_loss:.4f} | TAcc: {train_acc:.4f} | "
-                      f"VLoss: {val_loss:.4f} | VAcc: {val_acc:.4f} | "
-                      f"LR: {current_lr:.6f}")
+            if epoch % 5 == 0 or epoch == epochs - 1:
+                print(
+                    f"Epoch {epoch + 1:3d} | TLoss: {avg_loss:.4f} | TAcc: {train_acc:.4f} | VLoss: {val_loss:.4f} | VAcc: {val_acc:.4f}")
 
-            # Save best model
-            if val_acc > best_val_acc or (val_acc == best_val_acc and val_loss < best_val_loss):
-                best_val_loss = val_loss
+            # Save best
+            if val_acc > best_val_acc:
                 best_val_acc = val_acc
-
                 torch.save(self.model.state_dict(), self.models_dir / 'best_model.pth')
                 patience_counter = 0
             else:
                 patience_counter += 1
-
-            # Early stopping
-            if patience_counter >= patience:
-                print(f"\nEarly stopping at epoch {epoch + 1}")
-                break
+                if patience_counter >= 30:  # Increased early stopping patience
+                    print(f"Early stopping at epoch {epoch + 1}")
+                    break
 
         # Load best model
-        self.model.load_state_dict(torch.load(self.models_dir / 'best_model.pth'))
+        self.model.load_state_dict(torch.load(self.models_dir / 'best_model.pth', weights_only=True))
 
-        print("-" * 70)
-        print(f"\n✓ Training complete!")
-        print(f"  Best validation loss: {best_val_loss:.4f}")
-        print(f"  Best validation accuracy: {best_val_acc:.4f} ({best_val_acc*100:.2f}%)")
-    
     def evaluate(self, test_data):
-        """Comprehensive evaluation with all metrics"""
-        print("\n" + "="*70)
-        print("EVALUATION")
-        print("="*70)
-        
+        """Evaluate and generate ALL figures"""
+        print("\n" + "="*60 + "\nGENERATING FIGURES & METRICS\n" + "="*60)
+
         X_test, y_test = test_data
         X_test = torch.FloatTensor(X_test).to(self.device)
-        
+
         self.model.eval()
         with torch.no_grad():
             outputs = self.model(X_test)
-            probabilities = torch.softmax(outputs, dim=1)
-            _, predictions = torch.max(outputs, 1)
-        
-        predictions_np = predictions.cpu().numpy()
-        probabilities_np = probabilities.cpu().numpy()
-        
-        # Calculate all metrics
-        accuracy = accuracy_score(y_test, predictions_np)
-        precision_macro, recall_macro, f1_macro, _ = precision_recall_fscore_support(
-            y_test, predictions_np, average='macro', zero_division=0
-        )
-        precision_weighted, recall_weighted, f1_weighted, _ = precision_recall_fscore_support(
-            y_test, predictions_np, average='weighted', zero_division=0
-        )
-        
-        # Per-class metrics
-        precision_per_class, recall_per_class, f1_per_class, support = \
-            precision_recall_fscore_support(y_test, predictions_np, average=None, zero_division=0)
-        
-        # Confusion matrix
-        cm = confusion_matrix(y_test, predictions_np)
-        
-        # Matthews Correlation Coefficient
-        mcc = matthews_corrcoef(y_test, predictions_np)
-        
-        # Print results
-        print(f"\nOverall Metrics:")
-        print(f"  Accuracy:          {accuracy:.4f} ({accuracy*100:.2f}%)")
-        print(f"  Precision (macro): {precision_macro:.4f}")
-        print(f"  Recall (macro):    {recall_macro:.4f}")
-        print(f"  F1-Score (macro):  {f1_macro:.4f}")
-        print(f"  F1-Score (weighted): {f1_weighted:.4f}")
-        print(f"  Matthews Corr:     {mcc:.4f}")
-        
-        print(f"\nPer-Class Metrics:")
-        print(f"{'State':<15} {'Precision':>10} {'Recall':>10} {'F1':>10} {'Support':>10}")
-        print("-" * 60)
-        for i in range(6):
-            state = self.label_map[i]
-            print(f"{state:<15} {precision_per_class[i]:>10.4f} {recall_per_class[i]:>10.4f} "
-                  f"{f1_per_class[i]:>10.4f} {support[i]:>10}")
-        
-        # Save results
+            probs = torch.softmax(outputs, dim=1).cpu().numpy()
+            preds = torch.max(outputs, 1)[1].cpu().numpy()
+
+        # Metrics
+        acc = accuracy_score(y_test, preds)
+        p, r, f1, _ = precision_recall_fscore_support(y_test, preds, average='macro')
+        cm = confusion_matrix(y_test, preds)
+
+        print(f"Test Accuracy: {acc*100:.2f}%")
+
+        # --- GENERATE PLOTS ---
+        print("1. Plotting Training Curves...")
+        self._plot_training_curves()
+
+        print("2. Plotting Confusion Matrix...")
+        self._plot_confusion_matrix(cm)
+
+        print("3. Plotting Per-Class Metrics...")
+        self._plot_per_class_metrics(y_test, preds)
+
+        print("4. Plotting ROC Curves...")
+        self._plot_roc_curves(y_test, probs)
+
+        print("5. Plotting Class Distribution...")
+        self._plot_class_distribution()
+
+        print("6. Plotting Error Analysis...")
+        self._plot_error_analysis(y_test, preds)
+
+        # Save Metrics JSON
         results = {
-            'overall': {
-                'accuracy': float(accuracy),
-                'precision_macro': float(precision_macro),
-                'recall_macro': float(recall_macro),
-                'f1_macro': float(f1_macro),
-                'f1_weighted': float(f1_weighted),
-                'mcc': float(mcc)
-            },
-            'per_class': {
-                self.label_map[i]: {
-                    'precision': float(precision_per_class[i]),
-                    'recall': float(recall_per_class[i]),
-                    'f1_score': float(f1_per_class[i]),
-                    'support': int(support[i])
-                }
-                for i in range(6)
-            },
-            'confusion_matrix': cm.tolist(),
-            'timestamp': datetime.now().isoformat()
+            'accuracy': acc, 'precision': p, 'recall': r, 'f1': f1,
+            'confusion_matrix': cm.tolist()
         }
-        
         with open(self.metrics_dir / 'evaluation_results.json', 'w') as f:
             json.dump(results, f, indent=2)
-        
-        print(f"\n✓ Results saved to {self.metrics_dir / 'evaluation_results.json'}")
-        
-        return results, cm, probabilities_np, predictions_np
-    
-    def generate_all_figures(self, cm, probabilities, predictions, y_test):
-        """Generate all publication-quality figures"""
-        print("\n" + "="*70)
-        print("GENERATING FIGURES")
-        print("="*70)
-        
-        self._plot_training_curves()
-        self._plot_confusion_matrix(cm)
-        self._plot_per_class_metrics()
-        self._plot_roc_curves(probabilities, y_test)
-        self._plot_precision_recall_curves(probabilities, y_test)
-        self._plot_class_distribution()
-        self._plot_learning_rate_schedule()
-        self._plot_error_analysis(predictions, y_test)
-        
-        print(f"\n✓ All figures saved to {self.figures_dir}/")
-    
+
+        self.save_model()
+        print("\n✅ All outputs saved successfully!")
+
+    # ================= PLOTTING METHODS =================
+
     def _plot_training_curves(self):
-        """Figure 1: Training and validation curves"""
-        fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(10, 8))
-        
-        epochs = self.history['epoch']
-        
-        # Loss curves
-        ax1.plot(epochs, self.history['train_loss'], 'b-', label='Training', linewidth=1.5)
-        ax1.plot(epochs, self.history['val_loss'], 'r-', label='Validation', linewidth=1.5)
-        ax1.set_xlabel('Epoch')
-        ax1.set_ylabel('Loss')
-        ax1.set_title('(a) Training and Validation Loss')
-        ax1.legend(frameon=False)
-        ax1.grid(True, alpha=0.3, linestyle='--')
-        
-        # Accuracy curves
-        ax2.plot(epochs, self.history['train_acc'], 'b-', label='Training', linewidth=1.5)
-        ax2.plot(epochs, self.history['val_acc'], 'r-', label='Validation', linewidth=1.5)
-        ax2.set_xlabel('Epoch')
+        """Smoothed training curves"""
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+        epochs = range(1, len(self.history['train_loss']) + 1)
+
+        # Loss (with smoothing)
+        train_loss = self.history['train_loss']
+        val_loss = self.history['val_loss']
+
+        # Smooth curve if we have enough points
+        if len(epochs) > 10:
+            try:
+                train_smooth = savgol_filter(train_loss, 9, 3)
+                ax1.plot(epochs, train_smooth, '-', color='#2E86C1', alpha=1.0, linewidth=2, label='Train Loss (Smooth)')
+                ax1.plot(epochs, train_loss, '-', color='#2E86C1', alpha=0.2) # Ghost line
+            except:
+                ax1.plot(epochs, train_loss, 'o-', color='#2E86C1', label='Train Loss')
+        else:
+            ax1.plot(epochs, train_loss, 'o-', color='#2E86C1', label='Train Loss')
+
+        ax1.plot(epochs, val_loss, 's--', color='#E74C3C', linewidth=2, label='Validation Loss')
+
+        ax1.set_title('Learning Progression (Loss)', fontweight='bold')
+        ax1.set_xlabel('Epochs')
+        ax1.set_ylabel('Cross Entropy Loss')
+        ax1.legend()
+
+        # Accuracy
+        ax2.plot(epochs, self.history['train_acc'], '-', color='#27AE60', linewidth=2, label='Train Acc')
+        ax2.plot(epochs, self.history['val_acc'], 's--', color='#F39C12', linewidth=2, label='Val Acc')
+
+        ax2.set_title('Model Accuracy', fontweight='bold')
+        ax2.set_xlabel('Epochs')
         ax2.set_ylabel('Accuracy')
-        ax2.set_title('(b) Training and Validation Accuracy')
-        ax2.legend(frameon=False)
-        ax2.grid(True, alpha=0.3, linestyle='--')
-        ax2.set_ylim([0, 1])
-        
-        # Loss difference
-        loss_diff = np.array(self.history['train_loss']) - np.array(self.history['val_loss'])
-        ax3.plot(epochs, loss_diff, 'g-', linewidth=1.5)
-        ax3.axhline(y=0, color='k', linestyle='--', alpha=0.3)
-        ax3.set_xlabel('Epoch')
-        ax3.set_ylabel('Training - Validation Loss')
-        ax3.set_title('(c) Overfitting Indicator')
-        ax3.grid(True, alpha=0.3, linestyle='--')
-        
-        # Learning rate
-        ax4.plot(epochs, self.history['lr'], 'purple', linewidth=1.5)
-        ax4.set_xlabel('Epoch')
-        ax4.set_ylabel('Learning Rate')
-        ax4.set_title('(d) Learning Rate Schedule')
-        ax4.set_yscale('log')
-        ax4.grid(True, alpha=0.3, linestyle='--')
-        
+        ax2.legend(loc='lower right')
+
         plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig1_training_curves.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig1_training_curves.png', bbox_inches='tight')
+        plt.savefig(self.figures_dir / 'fig1_training_curves.png')
         plt.close()
-        print("  ✓ Figure 1: Training curves")
-    
+
     def _plot_confusion_matrix(self, cm):
-        """Figure 2: Confusion matrix"""
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-        
-        # Absolute counts
-        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax1,
-                   xticklabels=[self.state_abbrev[i] for i in range(6)],
-                   yticklabels=[self.label_map[i] for i in range(6)],
-                   cbar_kws={'label': 'Count'})
-        ax1.set_xlabel('Predicted State')
-        ax1.set_ylabel('True State')
-        ax1.set_title('(a) Confusion Matrix (Counts)')
-        
-        # Normalized (percentages)
-        cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-        sns.heatmap(cm_norm, annot=True, fmt='.2%', cmap='Blues', ax=ax2,
-                   xticklabels=[self.state_abbrev[i] for i in range(6)],
-                   yticklabels=[self.label_map[i] for i in range(6)],
-                   cbar_kws={'label': 'Percentage'})
-        ax2.set_xlabel('Predicted State')
-        ax2.set_ylabel('True State')
-        ax2.set_title('(b) Confusion Matrix (Normalized)')
-        
+        """Beautiful Seaborn Heatmap"""
+        plt.figure(figsize=(10, 8))
+
+        # Calculate percentages
+        cm_sum = np.sum(cm, axis=1, keepdims=True)
+        cm_perc = cm / cm_sum.astype(float) * 100
+
+        # Annotations: Count + Percentage
+        annot = np.empty_like(cm).astype(str)
+        nrows, ncols = cm.shape
+        for i in range(nrows):
+            for j in range(ncols):
+                c = cm[i, j]
+                p = cm_perc[i, j]
+                if i == j:
+                    annot[i, j] = f"{c}\n({p:.1f}%)"
+                else:
+                    annot[i, j] = f"{c}\n({p:.1f}%)"
+
+        labels = [self.label_map[i] for i in range(6)]
+
+        sns.heatmap(cm_perc, annot=annot, fmt='', cmap='Blues',
+                    xticklabels=labels, yticklabels=labels,
+                    cbar_kws={'label': 'Percentage (%)'},
+                    annot_kws={"size": 9})
+
+        plt.title('Confusion Matrix (Counts & %)', fontweight='bold', pad=20)
+        plt.xlabel('Predicted State', labelpad=10)
+        plt.ylabel('True State', labelpad=10)
+        plt.xticks(rotation=45)
         plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig2_confusion_matrix.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig2_confusion_matrix.png', bbox_inches='tight')
+        plt.savefig(self.figures_dir / 'fig2_confusion_matrix.png')
         plt.close()
-        print("  ✓ Figure 2: Confusion matrix")
-    
-    def _plot_per_class_metrics(self):
-        """Figure 3: Per-class performance"""
-        # Load results
-        with open(self.metrics_dir / 'evaluation_results.json', 'r') as f:
-            results = json.load(f)
-        
-        states = [self.label_map[i] for i in range(6)]
-        precision = [results['per_class'][s]['precision'] for s in states]
-        recall = [results['per_class'][s]['recall'] for s in states]
-        f1 = [results['per_class'][s]['f1_score'] for s in states]
-        
+
+    def _plot_per_class_metrics(self, y_true, y_pred):
+        """Bar chart for P/R/F1"""
+        p, r, f1, _ = precision_recall_fscore_support(y_true, y_pred, average=None)
+
+        labels = [self.state_abbrev[i] for i in range(6)]
+        x = np.arange(len(labels))
+        width = 0.25
+
+        plt.figure(figsize=(12, 6))
+        plt.bar(x - width, p, width, label='Precision', color='#3498DB', edgecolor='white')
+        plt.bar(x, r, width, label='Recall', color='#2ECC71', edgecolor='white')
+        plt.bar(x + width, f1, width, label='F1 Score', color='#9B59B6', edgecolor='white')
+
+        plt.title('Per-Class Performance Metrics', fontweight='bold')
+        plt.xticks(x, labels)
+        plt.ylim(0, 1.1)
+        plt.legend(ncol=3, loc='upper center', bbox_to_anchor=(0.5, -0.1))
+        plt.grid(axis='y', linestyle='--', alpha=0.5)
+
+        plt.tight_layout()
+        plt.savefig(self.figures_dir / 'fig3_per_class_metrics.png')
+        plt.close()
+
+    def _plot_roc_curves(self, y_test, probs):
+        """Multi-class ROC"""
+        y_bin = label_binarize(y_test, classes=[0,1,2,3,4,5])
+        n_classes = 6
+
+        plt.figure(figsize=(10, 8))
+        colors = sns.color_palette("bright", n_classes)
+
+        for i, color in zip(range(n_classes), colors):
+            fpr, tpr, _ = roc_curve(y_bin[:, i], probs[:, i])
+            roc_auc = auc(fpr, tpr)
+            plt.plot(fpr, tpr, color=color, lw=2,
+                     label=f'{self.label_map[i]} (AUC = {roc_auc:.3f})')
+
+        plt.plot([0, 1], [0, 1], 'k--', lw=1, alpha=0.5)
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.02])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('ROC Curves by Class', fontweight='bold')
+        plt.legend(loc="lower right")
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(self.figures_dir / 'fig4_roc_curves.png')
+        plt.close()
+
+    def _plot_class_distribution(self):
+        """Dataset Balance Plot"""
+        plt.figure(figsize=(10, 6))
+
+        states = [self.state_abbrev[i] for i in range(6)]
+
+        # Data from prepare_data
+        train_counts = self.class_dist['Train']
+        val_counts = self.class_dist['Val']
+        test_counts = self.class_dist['Test']
+
+        # Normalize to percentage
+        train_pct = train_counts / train_counts.sum() * 100
+        val_pct = val_counts / val_counts.sum() * 100
+        test_pct = test_counts / test_counts.sum() * 100
+
         x = np.arange(len(states))
         width = 0.25
-        
-        fig, ax = plt.subplots(figsize=(10, 5))
-        
-        bars1 = ax.bar(x - width, precision, width, label='Precision', color='#2E86AB')
-        bars2 = ax.bar(x, recall, width, label='Recall', color='#A23B72')
-        bars3 = ax.bar(x + width, f1, width, label='F1-Score', color='#F18F01')
-        
-        ax.set_xlabel('State')
-        ax.set_ylabel('Score')
-        ax.set_title('Per-State Performance Metrics')
-        ax.set_xticks(x)
-        ax.set_xticklabels(states, rotation=15, ha='right')
-        ax.legend(frameon=False)
-        ax.set_ylim([0, 1.05])
-        ax.grid(True, alpha=0.3, axis='y', linestyle='--')
-        
-        # Add value labels on bars
-        def autolabel(rects):
-            for rect in rects:
-                height = rect.get_height()
-                ax.annotate(f'{height:.2f}',
-                          xy=(rect.get_x() + rect.get_width() / 2, height),
-                          xytext=(0, 3),
-                          textcoords="offset points",
-                          ha='center', va='bottom', fontsize=7)
-        
-        autolabel(bars1)
-        autolabel(bars2)
-        autolabel(bars3)
-        
+
+        plt.bar(x - width, train_pct, width, label='Train', color='#34495E')
+        plt.bar(x, val_pct, width, label='Validation', color='#95A5A6')
+        plt.bar(x + width, test_pct, width, label='Test', color='#BDC3C7')
+
+        plt.ylabel('Percentage of Split (%)')
+        plt.title('Dataset Class Distribution (Balance Check)', fontweight='bold')
+        plt.xticks(x, states)
+        plt.legend()
+        plt.grid(axis='y', alpha=0.3)
         plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig3_per_class_metrics.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig3_per_class_metrics.png', bbox_inches='tight')
+        plt.savefig(self.figures_dir / 'fig5_class_distribution.png')
         plt.close()
-        print("  ✓ Figure 3: Per-class metrics")
-    
-    def _plot_roc_curves(self, probabilities, y_test):
-        """Figure 4: ROC curves"""
-        # Binarize labels
-        y_test_bin = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5])
-        
-        fig, ax = plt.subplots(figsize=(8, 6))
-        
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
-        
-        # Calculate ROC curve for each class
-        for i in range(6):
-            fpr, tpr, _ = roc_curve(y_test_bin[:, i], probabilities[:, i])
-            roc_auc = auc(fpr, tpr)
-            
-            ax.plot(fpr, tpr, color=colors[i], linewidth=1.5,
-                   label=f'{self.label_map[i]} (AUC = {roc_auc:.3f})')
-        
-        # Diagonal reference line
-        ax.plot([0, 1], [0, 1], 'k--', linewidth=1, alpha=0.5)
-        
-        ax.set_xlabel('False Positive Rate')
-        ax.set_ylabel('True Positive Rate')
-        ax.set_title('Receiver Operating Characteristic (ROC) Curves')
-        ax.legend(loc='lower right', frameon=False, fontsize=8)
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_xlim([0, 1])
-        ax.set_ylim([0, 1.05])
-        
+
+    def _plot_error_analysis(self, y_true, y_pred):
+        """Top Confusion Pairs"""
+        confusions = []
+        for t, p in zip(y_true, y_pred):
+            if t != p:
+                confusions.append(f"{self.state_abbrev[t]} → {self.state_abbrev[p]}")
+
+        if not confusions:
+            return
+
+        from collections import Counter
+        counts = Counter(confusions).most_common(10)
+        labels, values = zip(*counts)
+
+        plt.figure(figsize=(10, 6))
+        # FIX: Correct seaborn syntax to remove warning
+        sns.barplot(x=list(values), y=list(labels), hue=list(labels), palette='Reds_r', legend=False)
+
+        plt.title('Top 10 Misclassifications (Ground Truth → Predicted)', fontweight='bold')
+        plt.xlabel('Number of Errors')
+        plt.grid(axis='x', alpha=0.3)
         plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig4_roc_curves.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig4_roc_curves.png', bbox_inches='tight')
+        plt.savefig(self.figures_dir / 'fig6_error_analysis.png')
         plt.close()
-        print("  ✓ Figure 4: ROC curves")
-    
-    def _plot_precision_recall_curves(self, probabilities, y_test):
-        """Figure 5: Precision-Recall curves"""
-        from sklearn.metrics import precision_recall_curve, average_precision_score
-        
-        y_test_bin = label_binarize(y_test, classes=[0, 1, 2, 3, 4, 5])
-        
-        fig, ax = plt.subplots(figsize=(8, 6))
-        
-        colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
-        
-        for i in range(6):
-            precision, recall, _ = precision_recall_curve(y_test_bin[:, i], probabilities[:, i])
-            ap = average_precision_score(y_test_bin[:, i], probabilities[:, i])
-            
-            ax.plot(recall, precision, color=colors[i], linewidth=1.5,
-                   label=f'{self.label_map[i]} (AP = {ap:.3f})')
-        
-        ax.set_xlabel('Recall')
-        ax.set_ylabel('Precision')
-        ax.set_title('Precision-Recall Curves')
-        ax.legend(loc='lower left', frameon=False, fontsize=8)
-        ax.grid(True, alpha=0.3, linestyle='--')
-        ax.set_xlim([0, 1])
-        ax.set_ylim([0, 1.05])
-        
-        plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig5_precision_recall.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig5_precision_recall.png', bbox_inches='tight')
-        plt.close()
-        print("  ✓ Figure 5: Precision-Recall curves")
-    
-    def _plot_class_distribution(self):
-        """Figure 6: Class distribution in dataset"""
-        with open(self.metrics_dir / 'evaluation_results.json', 'r') as f:
-            results = json.load(f)
-        
-        states = [self.label_map[i] for i in range(6)]
-        counts = [results['per_class'][s]['support'] for s in states]
-        
-        fig, ax = plt.subplots(figsize=(8, 5))
-        
-        bars = ax.bar(states, counts, color='#4CAF50', alpha=0.7, edgecolor='black')
-        
-        ax.set_xlabel('State')
-        ax.set_ylabel('Number of Samples')
-        ax.set_title('Test Set Class Distribution')
-        ax.grid(True, alpha=0.3, axis='y', linestyle='--')
-        
-        # Add value labels
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'{int(height)}',
-                   ha='center', va='bottom')
-        
-        plt.xticks(rotation=15, ha='right')
-        plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig6_class_distribution.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig6_class_distribution.png', bbox_inches='tight')
-        plt.close()
-        print("  ✓ Figure 6: Class distribution")
-    
-    def _plot_learning_rate_schedule(self):
-        """Figure 7: Learning rate evolution"""
-        fig, ax = plt.subplots(figsize=(8, 4))
-        
-        ax.plot(self.history['epoch'], self.history['lr'], 'b-', linewidth=1.5)
-        ax.set_xlabel('Epoch')
-        ax.set_ylabel('Learning Rate')
-        ax.set_title('Learning Rate Schedule (ReduceLROnPlateau)')
-        ax.set_yscale('log')
-        ax.grid(True, alpha=0.3, linestyle='--')
-        
-        plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig7_lr_schedule.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig7_lr_schedule.png', bbox_inches='tight')
-        plt.close()
-        print("  ✓ Figure 7: LR schedule")
-    
-    def _plot_error_analysis(self, predictions, y_test):
-        """Figure 8: Error analysis"""
-        errors = predictions != y_test
-        error_states = y_test[errors]
-        
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 4))
-        
-        # Errors by true state
-        unique_states, counts = np.unique(error_states, return_counts=True)
-        states = [self.label_map[i] for i in unique_states]
-        
-        ax1.barh(states, counts, color='#E53935', alpha=0.7)
-        ax1.set_xlabel('Number of Misclassifications')
-        ax1.set_title('(a) Misclassifications by True State')
-        ax1.grid(True, alpha=0.3, axis='x', linestyle='--')
-        
-        # Error rate by state
-        error_rates = []
-        for i in range(6):
-            mask = y_test == i
-            if mask.sum() > 0:
-                error_rate = (predictions[mask] != y_test[mask]).sum() / mask.sum()
-                error_rates.append(error_rate * 100)
-            else:
-                error_rates.append(0)
-        
-        states = [self.label_map[i] for i in range(6)]
-        ax2.bar(states, error_rates, color='#FFA726', alpha=0.7, edgecolor='black')
-        ax2.set_ylabel('Error Rate (%)')
-        ax2.set_title('(b) Error Rate by State')
-        ax2.grid(True, alpha=0.3, axis='y', linestyle='--')
-        plt.xticks(rotation=15, ha='right')
-        
-        plt.tight_layout()
-        plt.savefig(self.figures_dir / 'fig8_error_analysis.pdf', bbox_inches='tight')
-        plt.savefig(self.figures_dir / 'fig8_error_analysis.png', bbox_inches='tight')
-        plt.close()
-        print("  ✓ Figure 8: Error analysis")
-    
+
     def save_model(self):
-        """Save complete model package"""
+        """Save final artifact"""
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'scaler': self.scaler,
-            'history': self.history,
             'label_map': self.label_map
         }, self.models_dir / 'trained_model.pth')
-        
-        print(f"\n✓ Model saved to {self.models_dir / 'trained_model.pth'}")
-
-
-def main():
-    """Main training script"""
-    import sys
-    sys.path.insert(0, '.')
-    
-    from updated_htan import UpdatedHTAN, prepare_data_for_training
-    
-    print("\n" + "="*70)
-    print("RESEARCH-GRADE TRAINING PIPELINE")
-    print("="*70)
-    
-    # Load dataset
-    dataset_path = Path('datasets/improved_dataset.json')
-    if not dataset_path.exists():
-        print(f"\n❌ Dataset not found: {dataset_path}")
-        print("   Run: python improved_datagen.py")
-        return
-    
-    print(f"\nLoading dataset from {dataset_path}...")
-    with open(dataset_path, 'r') as f:
-        dataset = json.load(f)
-    print(f"✓ Loaded {len(dataset):,} samples")
-    
-    # Prepare data
-    sequences, labels = prepare_data_for_training(dataset, seq_len=5)
-    
-    # Create model
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"\nCreating model on {device}...")
-    
-    model = UpdatedHTAN(
-        input_dim=30,
-        hidden_dim=128,
-        num_classes=6,
-        seq_len=5,
-        dropout=0.3
-    )
-    
-    # Create pipeline
-    pipeline = ResearchTrainingPipeline(model, device=device)
-    
-    # Prepare data
-    train_data, val_data, test_data = pipeline.prepare_data(sequences, labels)
-    
-    # Train
-    pipeline.train(train_data, val_data, epochs=150, batch_size=64, lr=0.0008)
-    
-    # Evaluate
-    results, cm, probs, preds = pipeline.evaluate(test_data)
-    
-    # Generate all figures
-    pipeline.generate_all_figures(cm, probs, preds, test_data[1])
-    
-    # Save model
-    pipeline.save_model()
-    
-    print("\n" + "="*70)
-    print("TRAINING COMPLETE!")
-    print("="*70)
-    print(f"\nOutputs saved to: {pipeline.output_dir}/")
-    print("  - Figures (PDF + PNG): research_outputs/figures/")
-    print("  - Metrics (JSON): research_outputs/metrics/")
-    print("  - Models: research_outputs/models/")
-    print("\n" + "="*70)
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except Exception as e:
-        print(f"\n❌ ERROR: {e}")
-        import traceback
-        traceback.print_exc()
+    # Import model architecture
+    sys.path.insert(0, '.')
+    from updated_htan import UpdatedHTAN, prepare_data_for_training_fixed
+
+    print("🚀 Starting Research Training Pipeline...")
+
+    # Load
+    dataset_path = Path('datasets/improved_dataset.json')
+    if not dataset_path.exists():
+        print("❌ Run improved_datagen.py first!")
         sys.exit(1)
+
+    with open(dataset_path, 'r') as f:
+        data = json.load(f)
+
+    # Split
+    splits = prepare_data_for_training_fixed(data, seq_len=5)
+
+    # Model
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    model = UpdatedHTAN(input_dim=30, hidden_dim=128, num_classes=6, seq_len=5)
+
+    # Run Pipeline
+    pipeline = ResearchTrainingPipeline(model, device)
+    splits_norm = pipeline.prepare_data(*splits)
+    pipeline.train(splits_norm[0], splits_norm[1], epochs=50) # 50 is enough for this data
+    pipeline.evaluate(splits_norm[2])
