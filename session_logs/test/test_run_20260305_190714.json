@@ -1,0 +1,44 @@
+[
+  {
+    "window": 5,
+    "true_state": "deep_work",
+    "predicted_state": "Deep Work",
+    "confidence": 0.9941608309745789,
+    "match": true
+  },
+  {
+    "window": 6,
+    "true_state": "communication",
+    "predicted_state": "Deep Work",
+    "confidence": 0.9960018992424011,
+    "match": false
+  },
+  {
+    "window": 7,
+    "true_state": "research",
+    "predicted_state": "Deep Work",
+    "confidence": 0.7690372467041016,
+    "match": false
+  },
+  {
+    "window": 8,
+    "true_state": "distracted",
+    "predicted_state": "Distracted",
+    "confidence": 0.6405807733535767,
+    "match": true
+  },
+  {
+    "window": 9,
+    "true_state": "active_work",
+    "predicted_state": "Distracted",
+    "confidence": 0.4729166030883789,
+    "match": false
+  },
+  {
+    "window": 10,
+    "true_state": "active_work",
+    "predicted_state": "Active Work",
+    "confidence": 0.40877267718315125,
+    "match": true
+  }
+]

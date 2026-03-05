@@ -1,0 +1,150 @@
+{
+  "user_id": "alice",
+  "start_time": "2026-03-05T19:08:05.685476",
+  "end_time": "2026-03-05T19:17:10.019711",
+  "duration_minutes": 9,
+  "total_windows": 8,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-03-05T19:13:05.962016",
+      "predicted": "Distracted",
+      "confidence": 0.9717388153076172,
+      "probabilities": {
+        "Deep Work": 2.1669831085091573e-07,
+        "Active Work": 0.0006045945920050144,
+        "Research": 0.027552573010325432,
+        "Communication": 0.00010371466487413272,
+        "Distracted": 0.9717388153076172,
+        "Idle": 1.3385812280830578e-07
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 828.4423749446869,
+          "chrome.exe": 2.002145767211914,
+          "Unknown": 1.5011281967163086,
+          "explorer.exe": 3.5065855979919434,
+          "Spotify.exe": 38.0514760017395,
+          "ShellExperienceHost.exe": 25.033197164535522
+        },
+        "heatmap_cells": 41
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-03-05T19:14:22.343275",
+      "predicted": "Distracted",
+      "confidence": 0.9638512134552002,
+      "probabilities": {
+        "Deep Work": 3.184309889547876e-06,
+        "Active Work": 0.02505209855735302,
+        "Research": 0.010809434577822685,
+        "Communication": 0.0002830768935382366,
+        "Distracted": 0.9638512134552002,
+        "Idle": 1.029411123454338e-06
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 888.0179595947266,
+          "chrome.exe": 2.002145767211914,
+          "Unknown": 1.5011281967163086,
+          "explorer.exe": 3.5065855979919434,
+          "Spotify.exe": 38.0514760017395,
+          "ShellExperienceHost.exe": 25.033197164535522
+        },
+        "heatmap_cells": 49
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 7,
+      "timestamp": "2026-03-05T19:15:30.983938",
+      "predicted": "Distracted",
+      "confidence": 0.9116930365562439,
+      "probabilities": {
+        "Deep Work": 5.090036211186089e-06,
+        "Active Work": 0.07730896025896072,
+        "Research": 0.010639434680342674,
+        "Communication": 0.00035168693284504116,
+        "Distracted": 0.9116930365562439,
+        "Idle": 1.6972231833278784e-06
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 928.0659008026123,
+          "chrome.exe": 2.002145767211914,
+          "Unknown": 1.5011281967163086,
+          "explorer.exe": 23.028795957565308,
+          "Spotify.exe": 38.0514760017395,
+          "ShellExperienceHost.exe": 25.033197164535522
+        },
+        "heatmap_cells": 66
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 8,
+      "timestamp": "2026-03-05T19:16:53.779663",
+      "predicted": "Distracted",
+      "confidence": 0.858290433883667,
+      "probabilities": {
+        "Deep Work": 1.3640324141306337e-05,
+        "Active Work": 0.12486646324396133,
+        "Research": 0.0161422248929739,
+        "Communication": 0.0006825033342465758,
+        "Distracted": 0.858290433883667,
+        "Idle": 4.688495209848043e-06
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "pycharm64.exe": 976.1239547729492,
+          "chrome.exe": 2.002145767211914,
+          "Unknown": 1.5011281967163086,
+          "explorer.exe": 28.03519105911255,
+          "Spotify.exe": 40.05953907966614,
+          "ShellExperienceHost.exe": 29.5401611328125
+        },
+        "heatmap_cells": 73
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 1,
+    "total_windows": 4,
+    "has_baseline": false
+  }
+}
