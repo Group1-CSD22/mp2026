@@ -1,0 +1,103 @@
+{
+  "user_id": "default_user",
+  "start_time": "2026-03-05T20:26:32.624773",
+  "end_time": "2026-03-05T20:33:03.181557",
+  "duration_minutes": 6,
+  "total_windows": 6,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-03-05T20:31:32.777695",
+      "predicted": "Idle",
+      "confidence": 0.9996960163116455,
+      "probabilities": {
+        "Deep Work": 2.179082684961031e-06,
+        "Active Work": 5.554117166184369e-08,
+        "Research": 2.354829348405474e-06,
+        "Communication": 0.0002979074779432267,
+        "Distracted": 1.5462475175809232e-06,
+        "Idle": 0.9996960163116455
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "flet.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "flet.exe": 585.5518043041229,
+          "Spotify.exe": 309.35157656669617,
+          "pycharm64.exe": 3.5035741329193115
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-03-05T20:32:39.952543",
+      "predicted": "Distracted",
+      "confidence": 0.9240087866783142,
+      "probabilities": {
+        "Deep Work": 2.6572342903818935e-05,
+        "Active Work": 0.010353045538067818,
+        "Research": 0.06422218680381775,
+        "Communication": 0.0013637898955494165,
+        "Distracted": 0.9240087866783142,
+        "Idle": 2.5711458874866366e-05
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "pycharm64.exe",
+        "app_category": "code_development",
+        "app_durations": {
+          "flet.exe": 592.5601427555084,
+          "Spotify.exe": 309.35157656669617,
+          "pycharm64.exe": 24.034576416015625,
+          "Unknown": 1.0010554790496826,
+          "explorer.exe": 4.004717588424683,
+          "chrome.exe": 27.036705017089844
+        },
+        "heatmap_cells": 53
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 3,
+    "total_windows": 9,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 4,
+    "by_predicted_state": {
+      "Active Work": {
+        "count": 2,
+        "corrections_to": {
+          "Idle": 2
+        }
+      },
+      "Communication": {
+        "count": 1,
+        "corrections_to": {
+          "Idle": 1
+        }
+      },
+      "Distracted": {
+        "count": 1,
+        "corrections_to": {
+          "Active Work": 1
+        }
+      }
+    },
+    "correction_rate": 0.4444444444444444
+  }
+}
