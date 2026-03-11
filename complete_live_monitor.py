@@ -90,6 +90,8 @@ class CompleteLiveMonitor:
         print(f"✓ Device: {self.device}")
         print(f"✓ Correction mode: {'ON' if self.correction_mode else 'OFF'}")
         print(f"✓ Profile status: {'Loaded' if self.user_profile.baseline else 'New'}")
+
+        self.stop_event = threading.Event()
     
     def _load_model(self, path):
         """Load trained model"""
@@ -130,6 +132,7 @@ class CompleteLiveMonitor:
             return
         
         self.is_monitoring = True
+        self.stop_event.clear()
         self.session_start = datetime.now()
         self.user_profile.start_session()
         
@@ -141,14 +144,17 @@ class CompleteLiveMonitor:
         print("="*80 + "\n")
         
         try:
-            while self.is_monitoring:
+            while not self.stop_event.is_set():
                 # Collect 1-minute window
                 elapsed = (datetime.now() - self.session_start).seconds // 60
-                print(f"[{datetime.now().strftime('%H:%M:%S')}] Collecting window #{self.window_count + 1}... ", end='', flush=True)
+                print(f"[{datetime.now().strftime('%H:%M:%S')}] Collecting window #{self.window_count + 1}... ")
                 
                 self.collector.start_collection()
-                time.sleep(60)  # 1 minute
+                stopped_early = self.stop_event.wait(60)
                 self.collector.stop_collection()
+
+                if stopped_early:
+                    break
                 
                 # Get features
                 features, metadata = self.collector.get_features()
@@ -389,6 +395,11 @@ class CompleteLiveMonitor:
         print(f"  Baseline: {'Established' if self.user_profile.baseline else 'Building'}")
         
         print("\n" + "="*80 + "\n")
+
+    def stop(self):
+        """Thread-safe stop trigger"""
+        print("\nStopping monitor via UI...")
+        self.stop_event.set()
 
 
 def run_test_mode(duration_minutes=10):
