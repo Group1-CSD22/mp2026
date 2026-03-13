@@ -24,7 +24,7 @@ class WorkMonitorApp(ctk.CTk):
         self.resizable(False, False)
 
         # Initialize core logic (Backend)
-        self.user_id = "user_hari"
+        self.user_id = "User"
         self.monitor = CompleteLiveMonitor(user_id=self.user_id)
         self.monitor_thread = None
         self.ui_update_job = None

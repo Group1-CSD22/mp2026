@@ -1,0 +1,159 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-03-11T09:44:48.409594",
+  "end_time": "2026-03-11T09:59:31.085558",
+  "duration_minutes": 14,
+  "total_windows": 8,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-03-11T09:54:05.735609",
+      "predicted": "Communication",
+      "confidence": 0.5415348410606384,
+      "probabilities": {
+        "Deep Work": 0.03649269789457321,
+        "Active Work": 0.07885877788066864,
+        "Research": 0.1568354368209839,
+        "Communication": 0.5415348410606384,
+        "Distracted": 0.15456093847751617,
+        "Idle": 0.03171727806329727
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python.exe": 803.9364869594574,
+          "Unknown": 860.980815410614,
+          "LockApp.exe": 3.005075454711914,
+          "explorer.exe": 1.5024983882904053
+        },
+        "heatmap_cells": 7
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-03-11T09:56:05.967333",
+      "predicted": "Idle",
+      "confidence": 0.9936816692352295,
+      "probabilities": {
+        "Deep Work": 0.00010618385567795485,
+        "Active Work": 9.817643331189174e-06,
+        "Research": 0.00010508077684789896,
+        "Communication": 0.006023156922310591,
+        "Distracted": 7.408714736811817e-05,
+        "Idle": 0.9936816692352295
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python.exe": 857.041232585907,
+          "Unknown": 860.980815410614,
+          "LockApp.exe": 3.005075454711914,
+          "explorer.exe": 1.5024983882904053,
+          "pycharm64.exe": 6.723143577575684
+        },
+        "heatmap_cells": 53
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 7,
+      "timestamp": "2026-03-11T09:57:15.958092",
+      "predicted": "Idle",
+      "confidence": 0.9973013997077942,
+      "probabilities": {
+        "Deep Work": 4.1415019950363785e-05,
+        "Active Work": 2.749383384070825e-06,
+        "Research": 4.154128328082152e-05,
+        "Communication": 0.0025848224759101868,
+        "Distracted": 2.8095962989027612e-05,
+        "Idle": 0.9973013997077942
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python.exe": 909.1377453804016,
+          "Unknown": 860.980815410614,
+          "LockApp.exe": 3.005075454711914,
+          "explorer.exe": 3.003405809402466,
+          "pycharm64.exe": 12.733146905899048
+        },
+        "heatmap_cells": 21
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 8,
+      "timestamp": "2026-03-11T09:58:42.482720",
+      "predicted": "Communication",
+      "confidence": 0.7987616062164307,
+      "probabilities": {
+        "Deep Work": 0.01927243545651436,
+        "Active Work": 0.06025807186961174,
+        "Research": 0.06013234332203865,
+        "Communication": 0.7987616062164307,
+        "Distracted": 0.0502372644841671,
+        "Idle": 0.011338180862367153
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python.exe": 959.2095482349396,
+          "Unknown": 860.980815410614,
+          "LockApp.exe": 3.005075454711914,
+          "explorer.exe": 7.0084497928619385,
+          "pycharm64.exe": 17.242642641067505,
+          "GitHubDesktop.exe": 1.0017485618591309
+        },
+        "heatmap_cells": 2
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 9,
+    "total_windows": 4,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 2,
+    "by_predicted_state": {
+      "Communication": {
+        "count": 2,
+        "corrections_to": {
+          "Distracted": 1,
+          "Idle": 1
+        }
+      }
+    },
+    "correction_rate": 0.5
+  }
+}

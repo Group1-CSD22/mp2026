@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "timestamp": "2026-03-11T09:55:05.899806",
+    "predicted": "Communication",
+    "actual": "Distracted",
+    "window_number": 0,
+    "session": 9,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "python.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python.exe": 803.9364869594574,
+        "Unknown": 860.980815410614,
+        "LockApp.exe": 3.005075454711914,
+        "explorer.exe": 1.5024983882904053
+      },
+      "heatmap_cells": 7
+    }
+  },
+  {
+    "timestamp": "2026-03-11T09:59:26.733770",
+    "predicted": "Communication",
+    "actual": "Idle",
+    "window_number": 3,
+    "session": 9,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "python.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python.exe": 959.2095482349396,
+        "Unknown": 860.980815410614,
+        "LockApp.exe": 3.005075454711914,
+        "explorer.exe": 7.0084497928619385,
+        "pycharm64.exe": 17.242642641067505,
+        "GitHubDesktop.exe": 1.0017485618591309
+      },
+      "heatmap_cells": 2
+    }
+  }
+]

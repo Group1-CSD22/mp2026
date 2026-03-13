@@ -1,0 +1,64 @@
+[
+  {
+    "timestamp": "2026-03-11T10:31:16.198238",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 0,
+    "session": 1,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python.exe": 898.7538688182831
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-03-11T10:38:19.377668",
+    "predicted": "Distracted",
+    "actual": "Idle",
+    "window_number": 5,
+    "session": 1,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "python.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python.exe": 1084.0862064361572,
+        "pycharm64.exe": 90.14963841438293,
+        "explorer.exe": 6.0731518268585205,
+        "SearchApp.exe": 0.5038914680480957,
+        "StartMenuExperienceHost.exe": 0.5012781620025635,
+        "ApplicationFrameHost.exe": 14.022217512130737,
+        "Taskmgr.exe": 1.5025601387023926
+      },
+      "heatmap_cells": 31
+    }
+  },
+  {
+    "timestamp": "2026-03-11T11:19:03.734004",
+    "predicted": "Distracted",
+    "actual": "Idle",
+    "window_number": 10,
+    "session": 2,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "pycharm64.exe",
+      "app_category": "code_development",
+      "app_durations": {
+        "python.exe": 476.6657838821411,
+        "Unknown": 7.513891935348511,
+        "firefox.exe": 35.55617713928223,
+        "explorer.exe": 18.03239941596985,
+        "GitHubDesktop.exe": 6.011788368225098,
+        "Taskmgr.exe": 28.042961835861206,
+        "SearchApp.exe": 12.015275478363037,
+        "notepad.exe": 214.82216262817383,
+        "pycharm64.exe": 338.53699135780334
+      },
+      "heatmap_cells": 0
+    }
+  }
+]
