@@ -1,0 +1,13 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-04T19:40:02.408502",
+  "end_time": "2026-05-04T19:40:02.785122",
+  "duration_minutes": 0,
+  "total_windows": 7,
+  "predictions": [],
+  "profile_stats": {
+    "session_number": 9,
+    "total_windows": 8,
+    "has_baseline": false
+  }
+}

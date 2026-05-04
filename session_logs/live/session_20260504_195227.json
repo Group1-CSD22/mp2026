@@ -1,0 +1,72 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-04T19:46:07.486106",
+  "end_time": "2026-05-04T19:52:27.633371",
+  "duration_minutes": 6,
+  "total_windows": 6,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-04T19:51:07.595567",
+      "predicted": "Idle",
+      "confidence": 0.9997319579124451,
+      "probabilities": {
+        "Deep Work": 1.938128662004601e-06,
+        "Active Work": 4.7073644537931614e-08,
+        "Research": 2.1240996375126997e-06,
+        "Communication": 0.0002625561028253287,
+        "Distracted": 1.3917186834078166e-06,
+        "Idle": 0.9997319579124451
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 898.855269908905
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-04T19:52:07.709179",
+      "predicted": "Distracted",
+      "confidence": 0.8986383080482483,
+      "probabilities": {
+        "Deep Work": 8.885456918505952e-05,
+        "Active Work": 0.04409877210855484,
+        "Research": 0.0543881431221962,
+        "Communication": 0.002705835271626711,
+        "Distracted": 0.8986383080482483,
+        "Idle": 8.010754390852526e-05
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1258.7351422309875
+        },
+        "heatmap_cells": 11
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 10,
+    "total_windows": 10,
+    "has_baseline": false
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-04T21:44:18.677328",
+  "end_time": "2026-05-04T21:53:42.972708",
+  "duration_minutes": 9,
+  "total_windows": 8,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-04T21:49:18.758941",
+      "predicted": "Idle",
+      "confidence": 0.9997711777687073,
+      "probabilities": {
+        "Deep Work": 1.618595206309692e-06,
+        "Active Work": 3.642217905053258e-08,
+        "Research": 1.7458944512327434e-06,
+        "Communication": 0.00022433065169025213,
+        "Distracted": 1.1539174238350824e-06,
+        "Idle": 0.9997711777687073
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 898.4631242752075
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-04T21:50:43.413107",
+      "predicted": "Idle",
+      "confidence": 0.9997358918190002,
+      "probabilities": {
+        "Deep Work": 1.9034736169487587e-06,
+        "Active Work": 4.5881648702561506e-08,
+        "Research": 2.0818742996198125e-06,
+        "Communication": 0.00025871495017781854,
+        "Distracted": 1.3659698652190855e-06,
+        "Idle": 0.9997358918190002
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1259.1374940872192
+        },
+        "heatmap_cells": 23
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 7,
+      "timestamp": "2026-05-04T21:51:57.443626",
+      "predicted": "Distracted",
+      "confidence": 0.8693981766700745,
+      "probabilities": {
+        "Deep Work": 0.00014849985018372536,
+        "Active Work": 0.07031203806400299,
+        "Research": 0.056065257638692856,
+        "Communication": 0.003945739008486271,
+        "Distracted": 0.8693981766700745,
+        "Idle": 0.00013029397814534605
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "chrome.exe",
+        "app_category": "browser",
+        "app_durations": {
+          "python3.10.exe": 1294.2238609790802,
+          "chrome.exe": 24.835106134414673
+        },
+        "heatmap_cells": 76
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 8,
+      "timestamp": "2026-05-04T21:53:13.856967",
+      "predicted": "Distracted",
+      "confidence": 0.9331520795822144,
+      "probabilities": {
+        "Deep Work": 1.6050187696237117e-05,
+        "Active Work": 0.04455534368753433,
+        "Research": 0.02104196511209011,
+        "Communication": 0.0012278147041797638,
+        "Distracted": 0.9331520795822144,
+        "Idle": 6.835004114691401e-06
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1354.2136237621307,
+          "chrome.exe": 24.835106134414673
+        },
+        "heatmap_cells": 25
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 14,
+    "total_windows": 26,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 3,
+    "by_predicted_state": {
+      "Idle": {
+        "count": 2,
+        "corrections_to": {
+          "Distracted": 1,
+          "Active Work": 1
+        }
+      },
+      "Distracted": {
+        "count": 1,
+        "corrections_to": {
+          "Active Work": 1
+        }
+      }
+    },
+    "correction_rate": 0.11538461538461539
+  }
+}

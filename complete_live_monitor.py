@@ -92,6 +92,8 @@ class CompleteLiveMonitor:
         print(f"✓ Profile status: {'Loaded' if self.user_profile.baseline else 'New'}")
 
         self.stop_event = threading.Event()
+        self.correction_event = threading.Event()  # NEW: Pauses the thread
+        self.waiting_for_correction = False  # NEW: Tells the UI we are paused
         self.ui_mode = False  # NEW: Tells backend a UI is controlling it
         self.supervised_mode = False  # NEW: Toggled by UI
     
@@ -172,6 +174,14 @@ class CompleteLiveMonitor:
                     remaining = 5 - len(self.feature_buffer)
                     print(f"   Building history... {remaining} more window(s) needed\n")
                     continue
+
+                if self.supervised_mode and self.ui_mode:
+                    print("\n⏸️ Supervised Mode: Paused. Waiting for UI confirmation...")
+                    self.waiting_for_correction = True
+                    self.correction_event.clear()
+                    self.correction_event.wait()  # THREAD FREEZES HERE UNTIL 'APPLY' IS CLICKED
+                    self.waiting_for_correction = False
+                    print("▶️ Resuming data collection...")
                 
                 # Make prediction
                 self._process_prediction(features, metadata)
@@ -208,18 +218,17 @@ class CompleteLiveMonitor:
         # --- UI SAFE CORRECTION LOGIC ---
         actual_state = predicted_state
 
-        # If running in terminal, do the old input() method
         if self.correction_mode and not self.ui_mode:
             actual_state = self._ask_for_correction(predicted_state, current_features, metadata)
-            self._apply_correction_logic(current_features, predicted_label, actual_state, sequence_norm, metadata)
-
-        # If running in UI mode, we just save the state. The UI will call apply_ui_correction if needed.
-        elif self.ui_mode:
-            # We apply the default prediction. If UI corrects it later, it handles the math.
+            # Add window data handles profile update
             actual_label = self.state_to_label[actual_state]
             self.user_profile.add_window_data(current_features, predicted_label, actual_label)
 
-            # Store latest sequence info for the UI to grab if a correction is clicked
+        elif self.ui_mode:
+            actual_label = self.state_to_label[actual_state]
+            self.user_profile.add_window_data(current_features, predicted_label, actual_label)
+
+            # Store data so apply_ui_correction can use it!
             self.latest_correction_data = {
                 'features': current_features,
                 'metadata': metadata,
@@ -227,46 +236,38 @@ class CompleteLiveMonitor:
                 'predicted_label': predicted_label,
                 'sequence_norm': sequence_norm
             }
-    
+
     def _display_prediction(self, state, confidence, probs, features, metadata, anomaly):
         """Display prediction results"""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print(f"PREDICTION #{self.window_count}")
-        print("="*80)
-        
-        # Main prediction
+        print("=" * 80)
+
         print(f"\n📊 STATE: {state.upper()}")
-        print(f"   Confidence: {confidence*100:.1f}%")
-        
-        # Top 3 probabilities
+        print(f"   Confidence: {confidence * 100:.1f}%")
+
         prob_dict = {self.label_map[i]: probs[i] for i in range(6)}
         top_3 = sorted(prob_dict.items(), key=lambda x: x[1], reverse=True)[:3]
-        
+
         print(f"\n   Top predictions:")
         for i, (s, p) in enumerate(top_3, 1):
             bar = '█' * int(p * 30)
-            print(f"   {i}. {s:15s} {bar:30s} {p*100:5.1f}%")
-        
-        # Key metrics
+            print(f"   {i}. {s:15s} {bar:30s} {p * 100:5.1f}%")
+
+        # --- YOUR METRICS ARE BACK! ---
         print(f"\n📈 WINDOW METRICS:")
         print(f"   Typing: {features[2]:.0f} WPM | {int(features[0])} keys")
         print(f"   Mouse: {features[8]:.0f}px moved | {int(features[17])} clicks")
-        print(f"   Apps: {int(features[24])} switches | Productivity: {features[26]*100:.0f}%")
-        
-        # App info
+        print(f"   Apps: {int(features[24])} switches | Productivity: {features[26] * 100:.0f}%")
+
         if metadata.get('current_app'):
             print(f"   Current app: {metadata['current_app']} ({metadata.get('app_category', 'unknown')})")
-        
-        # Anomaly check
-        if anomaly['is_anomaly']:
-            print(f"\n⚠️  ANOMALY DETECTED: {anomaly['severity'].upper()}")
-            print(f"   Score: {anomaly['score']:.2f} | Anomalous features: {anomaly['num_anomalous']}")
-        
-        # Session stats
+
+        # (Anomaly printing is kept hidden for UI cleanliness)
+
         elapsed = (datetime.now() - self.session_start).seconds // 60
         print(f"\n⏱️  Session: {elapsed} min | Windows: {self.window_count}")
-        
-        print("="*80)
+        print("=" * 80)
     
     def _ask_for_correction(self, predicted_state, features, metadata):
         """Ask user for manual correction"""
@@ -390,51 +391,82 @@ class CompleteLiveMonitor:
         print("\nStopping monitor via UI...")
         self.stop_event.set()
 
+    def apply_ui_correction(self, actual_state):
+        """Called safely by the UI when Supervised Mode is ON"""
+        # ALWAYS unpause the thread, even if it fails
+        if hasattr(self, 'correction_event'):
+            self.correction_event.set()
+
+        if not hasattr(self, 'latest_correction_data') or not self.latest_correction_data:
+            return False
+
+        data = self.latest_correction_data
+        predicted_state = data['predicted_state']
+
+        # If user just confirms the state is correct
+        if actual_state == predicted_state:
+            print(f"✓ State confirmed as: {actual_state}")
+            return True
+
+        actual_label = self.state_to_label[actual_state]
+
+        # Record correction
+        self.user_profile.add_correction(predicted_state, actual_state, data['features'], data['metadata'])
+        self.online_learner.add_experience(data['sequence_norm'][0], actual_label)
+
+        # Print progress to terminal!
+        current_buffer = len(self.online_learner.memory)
+        print(f"✓ Correction recorded: {predicted_state} -> {actual_state} (Buffer: {current_buffer}/10)")
+
+        if current_buffer >= 10:
+            loss = self.online_learner.update(batch_size=8, epochs=3)
+            print(f"\n   🔄 Model updated via UI (loss: {loss:.4f})")
+
+        return True
+
 
 def run_test_mode(duration_minutes=10):
     """Run quick test with simulated data"""
-    print("\n" + "="*80)
-    print(" "*25 + "TEST MODE (Simulated Data)")
-    print("="*80)
-    
+    print("\n" + "=" * 80)
+    print(" " * 25 + "TEST MODE (Simulated Data)")
+    print("=" * 80)
+
     from improved_datagen import ImprovedDatasetGenerator
-    
+
     gen = ImprovedDatasetGenerator()
     test_dir = Path("session_logs/test")
     test_dir.mkdir(exist_ok=True, parents=True)
-    
+
     # Load model
     model_path = Path('research_outputs/models/trained_model.pth')
     if not model_path.exists():
         print("\n❌ Model not found. Train first:")
         print("   python research_training.py")
         return
-    
+
     checkpoint = torch.load(model_path, map_location='cpu', weights_only=False)
-    
+
     model = UpdatedHTAN(input_dim=30, hidden_dim=128, num_classes=6, seq_len=5)
     model.load_state_dict(checkpoint['model_state_dict'])
     model.eval()
-    
+
     scaler = checkpoint['scaler']
-    
+
     label_map = {
         0: 'Deep Work', 1: 'Active Work', 2: 'Research',
         3: 'Communication', 4: 'Distracted', 5: 'Idle'
     }
-    
+
     print(f"\nRunning {duration_minutes}-minute test...\n")
-    
+
     num_windows = duration_minutes
     feature_buffer = deque(maxlen=5)
     predictions = []
-    
+
     for i in range(num_windows):
-        # Generate sample
         state = np.random.choice(list(gen.states.keys()))
         sample = gen.generate_sample(state)
-        
-        # Extract features
+
         feature_names = [
             'keystroke_count', 'keystroke_rate', 'typing_speed_wpm',
             'keystroke_variance', 'keystroke_burst_ratio', 'avg_inter_keystroke',
@@ -446,25 +478,24 @@ def run_test_mode(duration_minutes=10):
             'app_productivity', 'focus_stability', 'productive_ratio',
             'digit_ratio', 'special_ratio', 'click_variance', 'avg_scroll'
         ]
-        
+
         features = [sample[f] for f in feature_names]
         feature_buffer.append(features)
-        
+
         if len(feature_buffer) >= 5:
-            # Predict
             sequence = np.array(list(feature_buffer), dtype=np.float32)
             seq_flat = sequence.reshape(-1, 30)
             seq_norm = scaler.transform(seq_flat)
             sequence_norm = seq_norm.reshape(1, 5, 30)
-            
+
             with torch.no_grad():
                 x = torch.FloatTensor(sequence_norm)
                 outputs = model(x)
                 probs = torch.softmax(outputs, dim=1)
                 conf, pred = torch.max(probs, dim=1)
-            
+
             predicted_state = label_map[pred.item()]
-            
+
             predictions.append({
                 'window': i + 1,
                 'true_state': state,
@@ -472,54 +503,33 @@ def run_test_mode(duration_minutes=10):
                 'confidence': conf.item(),
                 'match': state.replace('_', ' ').title() == predicted_state
             })
-            
+
             match_symbol = '✓' if predictions[-1]['match'] else '✗'
-            print(f"Window {i+1:2d}: True: {state:20s} | Pred: {predicted_state:15s} "
-                  f"({conf.item()*100:5.1f}%) {match_symbol}")
-    
-    # Summary
+            print(f"Window {i + 1:2d}: True: {state:20s} | Pred: {predicted_state:15s} "
+                  f"({conf.item() * 100:5.1f}%) {match_symbol}")
+
     if predictions:
         accuracy = sum(p['match'] for p in predictions) / len(predictions)
         avg_conf = np.mean([p['confidence'] for p in predictions])
-        
-        print(f"\n{'='*80}")
+
+        print(f"\n{'=' * 80}")
         print(f"TEST RESULTS:")
         print(f"  Predictions: {len(predictions)}")
-        print(f"  Accuracy: {accuracy*100:.1f}%")
-        print(f"  Avg Confidence: {avg_conf*100:.1f}%")
-        print(f"{'='*80}\n")
-        
-        # Save test results
+        print(f"  Accuracy: {accuracy * 100:.1f}%")
+        print(f"  Avg Confidence: {avg_conf * 100:.1f}%")
+        print(f"{'=' * 80}\n")
+
         test_file = test_dir / f"test_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(test_file, 'w') as f:
             json.dump(predictions, f, indent=2)
-        
+
         print(f"✓ Test results saved to {test_file}\n")
 
-    def apply_ui_correction(self, actual_state):
-        """Called safely by the UI when Supervised Mode is ON"""
-        if not hasattr(self, 'latest_correction_data') or not self.latest_correction_data:
-            return False
 
-        data = self.latest_correction_data
-        predicted_state = data['predicted_state']
-
-        if actual_state == predicted_state:
-            return False
-
-        actual_label = self.state_to_label[actual_state]
-
-        # Record correction in profile
-        self.user_profile.add_correction(predicted_state, actual_state, data['features'], data['metadata'])
-
-        # Update Neural Network via Online Learning
-        self.online_learner.add_experience(data['sequence_norm'][0], actual_label)
-        if len(self.online_learner.memory) >= 10:
-            loss = self.online_learner.update(batch_size=8, epochs=3)
-            print(f"\n   🔄 Model updated via UI (loss: {loss:.4f})")
-
-        return True
-
+# -------- PASTE ABOVE THIS LINE --------
+if __name__ == "__main__":
+    import sys
+    # ...
 
 if __name__ == "__main__":
     import sys

@@ -1,0 +1,72 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-04T19:58:43.756826",
+  "end_time": "2026-05-04T20:04:55.011516",
+  "duration_minutes": 6,
+  "total_windows": 6,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-04T20:03:43.858462",
+      "predicted": "Idle",
+      "confidence": 0.9997715353965759,
+      "probabilities": {
+        "Deep Work": 1.6172164123418042e-06,
+        "Active Work": 3.635368983623266e-08,
+        "Research": 1.744407313708507e-06,
+        "Communication": 0.00022390176309272647,
+        "Distracted": 1.1529650691954885e-06,
+        "Idle": 0.9997715353965759
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 898.4261283874512
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-04T20:04:43.984086",
+      "predicted": "Distracted",
+      "confidence": 0.8967692255973816,
+      "probabilities": {
+        "Deep Work": 8.357874321518466e-05,
+        "Active Work": 0.045298174023628235,
+        "Research": 0.05521254613995552,
+        "Communication": 0.002562300767749548,
+        "Distracted": 0.8967692255973816,
+        "Idle": 7.422284397762269e-05
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1258.3857398033142
+        },
+        "heatmap_cells": 9
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 11,
+    "total_windows": 12,
+    "has_baseline": false
+  }
+}

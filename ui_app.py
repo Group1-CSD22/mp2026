@@ -33,8 +33,11 @@ class WorkMonitorApp(ctk.CTk):
         # UI State
         self.timer_seconds = 0
         self.is_timer_running = False
+        self.is_timer_paused = False  # NEW: Pauses the UI clock
         self.consecutive_states = {"state": None, "count": 0}
         self.chart_canvas = None
+
+        self.last_window_count = 0
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
@@ -166,10 +169,14 @@ class WorkMonitorApp(ctk.CTk):
 
         if is_supervised:
             self.correction_frame.pack(pady=20)
-            self.lbl_toast.configure(text="Supervised Mode ON: You can override predictions.", text_color="#3498DB")
+            self.lbl_toast.configure(text="Supervised Mode ON: Will pause after next window.", text_color="#3498DB")
         else:
             self.correction_frame.pack_forget()
             self.lbl_toast.configure(text="")
+            # SAFETY CATCH: If user toggles OFF while paused, unpause it!
+            if getattr(self.monitor, 'waiting_for_correction', False):
+                if hasattr(self.monitor, 'correction_event'):
+                    self.monitor.correction_event.set()
 
     def start_monitoring(self):
         self.btn_start.configure(state="disabled")
@@ -203,30 +210,45 @@ class WorkMonitorApp(ctk.CTk):
         self.after(500, self.update_dashboard_stats)
 
     def submit_correction(self):
-        """Send manual correction to backend model"""
+        """Send manual correction to backend model and unpause"""
         selected_state = self.state_dropdown.get()
         success = self.monitor.apply_ui_correction(selected_state)
 
-        if success:
-            self.lbl_current_state.configure(text=f"Live State: {selected_state} (Corrected)")
-            self.lbl_toast.configure(text=f"Model updated via Experience Replay!", text_color="#2ECC71")
+        # Unpause everything immediately for crisp UI feel
+        self.is_timer_paused = False
+        self.btn_correct.configure(state="disabled", text="Waiting...")
+        self.lbl_current_state.configure(text=f"Live State: {selected_state} (Confirmed)")
+
+        if self.monitor.latest_correction_data['predicted_state'] != selected_state:
+            buffer_size = len(self.monitor.online_learner.memory)
+            self.lbl_toast.configure(text=f"▶️ Resuming... (Correction {buffer_size}/10 saved)", text_color="#2ECC71")
         else:
-            self.lbl_toast.configure(text="No correction needed (State matches).", text_color="gray")
+            self.lbl_toast.configure(text="▶️ Resuming...", text_color="#3498DB")
 
     def poll_backend_results(self):
+        if not self.winfo_exists():
+            return
+
         if self.is_timer_running:
-            if len(self.monitor.session_predictions) > 0:
+            current_windows = len(self.monitor.session_predictions)
+
+            # 1. Update UI if we have a new window
+            if current_windows > self.last_window_count:
                 latest = self.monitor.session_predictions[-1]
                 state = latest['predicted']
                 conf = latest['confidence'] * 100
 
                 self.lbl_current_state.configure(text=f"Live State: {state} ({conf:.1f}%)")
-
-                # Update dropdown default to match current state
                 self.state_dropdown.set(state)
-
-                # --- SMART TOAST LOGIC ---
                 self.update_smart_toasts(state)
+                self.last_window_count = current_windows
+
+            # 2. Handle Pausing visually
+            if getattr(self.monitor, 'waiting_for_correction', False):
+                self.is_timer_paused = True
+                self.btn_correct.configure(state="normal", text="Confirm & Resume")
+                self.lbl_toast.configure(text="⏸️ Timer paused. Please confirm or correct the state.",
+                                         text_color="#F39C12")
 
             self.ui_update_job = self.after(2000, self.poll_backend_results)
 
@@ -250,12 +272,17 @@ class WorkMonitorApp(ctk.CTk):
                 self.lbl_toast.configure(text="")
 
     def update_timer(self):
-        if self.is_timer_running:
+        # --- BULLETPROOF KILL SWITCH ---
+        if not self.winfo_exists():
+            return
+
+        if self.is_timer_running and not self.is_timer_paused:
             hours, remainder = divmod(self.timer_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
             self.lbl_timer.configure(text=f"{hours:02d}:{minutes:02d}:{seconds:02d}")
             self.timer_seconds += 1
-            self.timer_job = self.after(1000, self.update_timer)
+
+        self.timer_job = self.after(1000, self.update_timer)
 
     def update_dashboard_stats(self):
         sessions = self.monitor.user_profile.session_count
@@ -293,25 +320,20 @@ class WorkMonitorApp(ctk.CTk):
         self.chart_canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def on_closing(self):
-        """Gracefully shut down threads and timers before closing"""
+        """Absolute Kill Switch for graceful shutdown"""
         print("\nInitiating safe shutdown sequence...")
-
-        # 1. Stop the backend monitor thread if it's running
         self.is_timer_running = False
+
         if hasattr(self, 'monitor') and self.monitor:
             self.monitor.stop()
 
-        # 2. Cancel UI polling loops
-        if self.ui_update_job:
-            self.after_cancel(self.ui_update_job)
+        self.quit()  # Stops the UI main loop
+        self.destroy()  # Destroys the window
 
-        # 3. Cancel the timer loop
-        if self.timer_job:
-            self.after_cancel(self.timer_job)
-
-        # 4. Destroy the CustomTkinter window safely
-        self.destroy()
+        # The Nuclear Option: Kills all Python background threads instantly
+        import os
         print("Shutdown complete. Goodbye!")
+        os._exit(0)
 
 if __name__ == "__main__":
     app = WorkMonitorApp()

@@ -1,1 +1,51 @@
-[]
+[
+  {
+    "timestamp": "2026-05-04T21:50:43.399101",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 23,
+    "session": 14,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 898.4631242752075
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-04T21:51:57.437900",
+    "predicted": "Idle",
+    "actual": "Active Work",
+    "window_number": 24,
+    "session": 14,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 1259.1374940872192
+      },
+      "heatmap_cells": 23
+    }
+  },
+  {
+    "timestamp": "2026-05-04T21:53:13.840863",
+    "predicted": "Distracted",
+    "actual": "Active Work",
+    "window_number": 25,
+    "session": 14,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "chrome.exe",
+      "app_category": "browser",
+      "app_durations": {
+        "python3.10.exe": 1294.2238609790802,
+        "chrome.exe": 24.835106134414673
+      },
+      "heatmap_cells": 76
+    }
+  }
+]
