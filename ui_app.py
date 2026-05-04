@@ -88,19 +88,34 @@ class WorkMonitorApp(ctk.CTk):
         frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
         self.frames["dashboard"] = frame
 
-        ctk.CTkLabel(frame, text="System Overview", font=ctk.CTkFont(size=28, weight="bold")).pack(pady=(0, 30), anchor="w")
+        ctk.CTkLabel(frame, text="System Overview", font=ctk.CTkFont(size=28, weight="bold")).pack(pady=(0, 20),
+                                                                                                   anchor="w")
 
+        # Metrics Grid
         stats_frame = ctk.CTkFrame(frame, corner_radius=10)
-        stats_frame.pack(fill="x", pady=10, ipady=20)
+        stats_frame.pack(fill="x", pady=10, ipady=15)
 
         self.lbl_profile_sessions = ctk.CTkLabel(stats_frame, text="Total Sessions: 0", font=ctk.CTkFont(size=18))
-        self.lbl_profile_sessions.pack(pady=10)
+        self.lbl_profile_sessions.pack(pady=5)
 
         self.lbl_profile_time = ctk.CTkLabel(stats_frame, text="Evaluated Windows: 0", font=ctk.CTkFont(size=18))
-        self.lbl_profile_time.pack(pady=10)
+        self.lbl_profile_time.pack(pady=5)
 
-        self.lbl_profile_baseline = ctk.CTkLabel(stats_frame, text="Baseline: Building", font=ctk.CTkFont(size=18))
-        self.lbl_profile_baseline.pack(pady=10)
+        self.lbl_productivity = ctk.CTkLabel(stats_frame, text="Global Productivity Score: 0%",
+                                             font=ctk.CTkFont(size=18, weight="bold"), text_color="#3498DB")
+        self.lbl_productivity.pack(pady=10)
+
+        # Baseline Visualizer
+        baseline_frame = ctk.CTkFrame(frame, corner_radius=10, fg_color="#2B2B2B")
+        baseline_frame.pack(fill="x", pady=20, ipady=15)
+
+        self.lbl_profile_baseline = ctk.CTkLabel(baseline_frame, text="Behavioral Baseline: Building...",
+                                                 font=ctk.CTkFont(size=16))
+        self.lbl_profile_baseline.pack(pady=5)
+
+        self.baseline_progress = ctk.CTkProgressBar(baseline_frame, progress_color="#2ECC71")
+        self.baseline_progress.pack(pady=10, padx=40, fill="x")
+        self.baseline_progress.set(0.0)
 
     def setup_monitor_frame(self):
         frame = ctk.CTkFrame(self.main_frame, fg_color="transparent")
@@ -109,36 +124,50 @@ class WorkMonitorApp(ctk.CTk):
         ctk.CTkLabel(frame, text="Live Activity Tracker", font=ctk.CTkFont(size=28, weight="bold")).pack(pady=(0, 10))
 
         # Timer
-        self.lbl_timer = ctk.CTkLabel(frame, text="00:00:00", font=ctk.CTkFont(size=65, weight="bold"), text_color="#2FA572")
+        self.lbl_timer = ctk.CTkLabel(frame, text="00:00:00", font=ctk.CTkFont(size=65, weight="bold"),
+                                      text_color="#2FA572")
         self.lbl_timer.pack(pady=10)
 
         # Start/Stop Controls
         control_frame = ctk.CTkFrame(frame, fg_color="transparent")
         control_frame.pack(pady=10)
-        self.btn_start = ctk.CTkButton(control_frame, text="▶ START", command=self.start_monitoring, width=120, fg_color="#2FA572", hover_color="#1E7A52")
+        self.btn_start = ctk.CTkButton(control_frame, text="▶ START", command=self.start_monitoring, width=120,
+                                       fg_color="#2FA572", hover_color="#1E7A52")
         self.btn_start.pack(side="left", padx=10)
-        self.btn_stop = ctk.CTkButton(control_frame, text="■ STOP", command=self.stop_monitoring, width=120, fg_color="#E03B3B", hover_color="#A82A2A", state="disabled")
+        self.btn_stop = ctk.CTkButton(control_frame, text="■ STOP", command=self.stop_monitoring, width=120,
+                                      fg_color="#E03B3B", hover_color="#A82A2A", state="disabled")
         self.btn_stop.pack(side="left", padx=10)
 
-        # State Card
+        # --- REDESIGNED STATUS CARD ---
         self.status_card = ctk.CTkFrame(frame, corner_radius=15)
-        self.status_card.pack(pady=20, fill="x", padx=40, ipady=20)
+        self.status_card.pack(pady=20, fill="x", padx=40, ipady=15)
 
-        self.lbl_current_state = ctk.CTkLabel(self.status_card, text="Waiting to start...", font=ctk.CTkFont(size=24, weight="bold"))
-        self.lbl_current_state.pack(pady=10)
+        # Line 1: What the system is currently doing
+        self.lbl_current_status = ctk.CTkLabel(self.status_card, text="Waiting to start...",
+                                               font=ctk.CTkFont(size=16, slant="italic"), text_color="gray")
+        self.lbl_current_status.pack(pady=(10, 0))
+
+        # Line 2: The final prediction for the last processed window
+        self.lbl_previous_state = ctk.CTkLabel(self.status_card, text="Latest Result: None",
+                                               font=ctk.CTkFont(size=24, weight="bold"))
+        self.lbl_previous_state.pack(pady=(5, 10))
 
         # Smart Toast Area
-        self.lbl_toast = ctk.CTkLabel(self.status_card, text="", font=ctk.CTkFont(size=14, slant="italic"), text_color="#FFA500")
+        self.lbl_toast = ctk.CTkLabel(self.status_card, text="", font=ctk.CTkFont(size=14), text_color="#FFA500")
         self.lbl_toast.pack()
 
-        # Supervised Mode Correction Panel (Hidden by default)
+        # Supervised Mode Correction Panel
         self.correction_frame = ctk.CTkFrame(frame, fg_color="transparent")
 
-        ctk.CTkLabel(self.correction_frame, text="Supervised Override:", font=ctk.CTkFont(size=14)).pack(side="left", padx=10)
-        self.state_dropdown = ctk.CTkOptionMenu(self.correction_frame, values=["Deep Work", "Active Work", "Research", "Communication", "Distracted", "Idle"])
+        ctk.CTkLabel(self.correction_frame, text="Supervised Override:", font=ctk.CTkFont(size=14)).pack(side="left",
+                                                                                                         padx=10)
+        self.state_dropdown = ctk.CTkOptionMenu(self.correction_frame,
+                                                values=["Deep Work", "Active Work", "Research", "Communication",
+                                                        "Distracted", "Idle"])
         self.state_dropdown.pack(side="left", padx=10)
 
-        self.btn_correct = ctk.CTkButton(self.correction_frame, text="Apply Correction", command=self.submit_correction, fg_color="#F39C12", hover_color="#D68910")
+        self.btn_correct = ctk.CTkButton(self.correction_frame, text="Confirm & Resume", command=self.submit_correction,
+                                         fg_color="#F39C12", hover_color="#D68910")
         self.btn_correct.pack(side="left", padx=10)
 
     def setup_results_frame(self):
@@ -181,10 +210,16 @@ class WorkMonitorApp(ctk.CTk):
     def start_monitoring(self):
         self.btn_start.configure(state="disabled")
         self.btn_stop.configure(state="normal")
-        self.lbl_current_state.configure(text="Collecting data (5 min warmup)...", text_color="white")
+
+        # Update our new split labels
+        self.lbl_current_status.configure(text="▶️ Collecting Window #1 (5 min warmup)...", text_color="white")
+        self.lbl_previous_state.configure(text="Latest Result: None", text_color="white")
+
         self.monitor.session_predictions = []
+        self.last_window_count = 0
 
         self.is_timer_running = True
+        self.is_timer_paused = False
         self.timer_seconds = 0
         self.update_timer()
 
@@ -195,7 +230,9 @@ class WorkMonitorApp(ctk.CTk):
     def stop_monitoring(self):
         self.btn_start.configure(state="normal")
         self.btn_stop.configure(state="disabled")
-        self.lbl_current_state.configure(text="Monitoring Stopped.")
+
+        # FIXED: Using the new label names!
+        self.lbl_current_status.configure(text="⏹️ Monitoring Stopped.", text_color="red")
         self.lbl_toast.configure(text="")
 
         self.is_timer_running = False
@@ -212,18 +249,27 @@ class WorkMonitorApp(ctk.CTk):
     def submit_correction(self):
         """Send manual correction to backend model and unpause"""
         selected_state = self.state_dropdown.get()
+        current_windows = len(self.monitor.session_predictions)
+
         success = self.monitor.apply_ui_correction(selected_state)
 
-        # Unpause everything immediately for crisp UI feel
         self.is_timer_paused = False
         self.btn_correct.configure(state="disabled", text="Waiting...")
-        self.lbl_current_state.configure(text=f"Live State: {selected_state} (Confirmed)")
 
-        if self.monitor.latest_correction_data['predicted_state'] != selected_state:
+        # SAFE CHECK: Ensure the backend actually generated the data
+        predicted = selected_state
+        if hasattr(self.monitor, 'latest_correction_data') and 'predicted_state' in self.monitor.latest_correction_data:
+            predicted = self.monitor.latest_correction_data['predicted_state']
+
+        if predicted != selected_state:
+            self.lbl_previous_state.configure(text=f"Window #{current_windows}: {selected_state} (Corrected)")
             buffer_size = len(self.monitor.online_learner.memory)
             self.lbl_toast.configure(text=f"▶️ Resuming... (Correction {buffer_size}/10 saved)", text_color="#2ECC71")
         else:
+            self.lbl_previous_state.configure(text=f"Window #{current_windows}: {selected_state} (Confirmed)")
             self.lbl_toast.configure(text="▶️ Resuming...", text_color="#3498DB")
+
+        self.lbl_current_status.configure(text=f"▶️ Collecting Window #{current_windows + 1}...", text_color="gray")
 
     def poll_backend_results(self):
         if not self.winfo_exists():
@@ -232,13 +278,14 @@ class WorkMonitorApp(ctk.CTk):
         if self.is_timer_running:
             current_windows = len(self.monitor.session_predictions)
 
-            # 1. Update UI if we have a new window
+            # 1. Update UI if we have a NEW prediction
             if current_windows > self.last_window_count:
                 latest = self.monitor.session_predictions[-1]
                 state = latest['predicted']
                 conf = latest['confidence'] * 100
 
-                self.lbl_current_state.configure(text=f"Live State: {state} ({conf:.1f}%)")
+                # Lock in the latest result
+                self.lbl_previous_state.configure(text=f"Window #{current_windows}: {state} ({conf:.1f}%)")
                 self.state_dropdown.set(state)
                 self.update_smart_toasts(state)
                 self.last_window_count = current_windows
@@ -247,8 +294,14 @@ class WorkMonitorApp(ctk.CTk):
             if getattr(self.monitor, 'waiting_for_correction', False):
                 self.is_timer_paused = True
                 self.btn_correct.configure(state="normal", text="Confirm & Resume")
-                self.lbl_toast.configure(text="⏸️ Timer paused. Please confirm or correct the state.",
-                                         text_color="#F39C12")
+                self.lbl_current_status.configure(text=f"⏸️ Window #{current_windows} Paused for Review",
+                                                  text_color="#F39C12")
+                self.lbl_toast.configure(text="Please confirm or override the state below.", text_color="#F39C12")
+            else:
+                # If running normally without pause
+                if current_windows > 0:
+                    self.lbl_current_status.configure(text=f"▶️ Collecting Window #{current_windows + 1}...",
+                                                      text_color="gray")
 
             self.ui_update_job = self.after(2000, self.poll_backend_results)
 
@@ -285,13 +338,34 @@ class WorkMonitorApp(ctk.CTk):
         self.timer_job = self.after(1000, self.update_timer)
 
     def update_dashboard_stats(self):
-        sessions = self.monitor.user_profile.session_count
-        evaluated_minutes = self.monitor.user_profile.total_windows
-        has_baseline = "Established" if self.monitor.user_profile.baseline else "Building Baseline..."
+        # Use getattr as a safety net in case these variables are named differently
+        sessions = getattr(self.monitor.user_profile, 'session_count', 0)
+        evaluated_minutes = getattr(self.monitor.user_profile, 'total_windows', 0)
 
-        self.lbl_profile_sessions.configure(text=f"Total Sessions: {sessions}")
-        self.lbl_profile_time.configure(text=f"Evaluated Windows: {evaluated_minutes}")
-        self.lbl_profile_baseline.configure(text=f"Baseline Status: {has_baseline}")
+        # Calculate a visual progress bar (assume 60 minutes needed for a full baseline)
+        progress_val = min(evaluated_minutes / 60.0, 1.0) if evaluated_minutes > 0 else 0.0
+        self.baseline_progress.set(progress_val)
+
+        if getattr(self.monitor.user_profile, 'baseline', False) or progress_val >= 1.0:
+            has_baseline = "Established (100%)"
+            self.baseline_progress.set(1.0)
+        else:
+            has_baseline = f"Building... ({int(progress_val * 100)}%)"
+
+        # SAFELY calculate System Confidence (This fixes your crash!)
+        # We try to grab total_corrections, but default to 0 if it's not stored that way
+        total_corrections = getattr(self.monitor.user_profile, 'total_corrections', 0)
+
+        if evaluated_minutes > 0:
+            corr_rate = total_corrections / evaluated_minutes
+            prod_score = max(100 - (corr_rate * 100), 0)
+        else:
+            prod_score = 100.0
+
+        self.lbl_profile_sessions.configure(text=f"Total Recorded Sessions: {sessions}")
+        self.lbl_profile_time.configure(text=f"Total Evaluated Windows: {evaluated_minutes} mins")
+        self.lbl_productivity.configure(text=f"Global System Confidence: {prod_score:.1f}%")
+        self.lbl_profile_baseline.configure(text=f"Behavioral Baseline: {has_baseline}")
 
     def generate_analytics_chart(self):
         """Generate an attractive Matplotlib Pie Chart in the UI"""

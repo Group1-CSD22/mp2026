@@ -96,6 +96,7 @@ class CompleteLiveMonitor:
         self.waiting_for_correction = False  # NEW: Tells the UI we are paused
         self.ui_mode = False  # NEW: Tells backend a UI is controlling it
         self.supervised_mode = False  # NEW: Toggled by UI
+        self.latest_correction_data = {}
     
     def _load_model(self, path):
         """Load trained model"""
@@ -175,11 +176,11 @@ class CompleteLiveMonitor:
                     print(f"   Building history... {remaining} more window(s) needed\n")
                     continue
 
-                if self.supervised_mode and self.ui_mode:
+                if self.supervised_mode and self.ui_mode and self.window_count > 5:
                     print("\n⏸️ Supervised Mode: Paused. Waiting for UI confirmation...")
                     self.waiting_for_correction = True
                     self.correction_event.clear()
-                    self.correction_event.wait()  # THREAD FREEZES HERE UNTIL 'APPLY' IS CLICKED
+                    self.correction_event.wait()
                     self.waiting_for_correction = False
                     print("▶️ Resuming data collection...")
                 

@@ -1,0 +1,120 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-04T22:00:17.076793",
+  "end_time": "2026-05-04T22:09:58.272295",
+  "duration_minutes": 9,
+  "total_windows": 7,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-04T22:05:26.240781",
+      "predicted": "Idle",
+      "confidence": 0.9997612833976746,
+      "probabilities": {
+        "Deep Work": 1.6853979332154267e-06,
+        "Active Work": 3.8780662237059005e-08,
+        "Research": 1.8328177020521252e-06,
+        "Communication": 0.0002339369966648519,
+        "Distracted": 1.2047350992361316e-06,
+        "Idle": 0.9997612833976746
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 899.3554022312164
+        },
+        "heatmap_cells": 0
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-04T22:08:19.113695",
+      "predicted": "Idle",
+      "confidence": 0.9996646642684937,
+      "probabilities": {
+        "Deep Work": 2.4475541522406274e-06,
+        "Active Work": 6.64078712020455e-08,
+        "Research": 2.7332214358466445e-06,
+        "Communication": 0.00032831390853971243,
+        "Distracted": 1.777101488187327e-06,
+        "Idle": 0.9996646642684937
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 959.0226528644562
+        },
+        "heatmap_cells": 27
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    },
+    {
+      "window": 7,
+      "timestamp": "2026-05-04T22:09:23.737852",
+      "predicted": "Idle",
+      "confidence": 0.9996684789657593,
+      "probabilities": {
+        "Deep Work": 2.41726593230851e-06,
+        "Active Work": 6.5224739387304e-08,
+        "Research": 2.6963411983160768e-06,
+        "Communication": 0.000324615539284423,
+        "Distracted": 1.7540893395562307e-06,
+        "Idle": 0.9996684789657593
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1018.6583490371704
+        },
+        "heatmap_cells": 14
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 15,
+    "total_windows": 29,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 3,
+    "by_predicted_state": {
+      "Idle": {
+        "count": 2,
+        "corrections_to": {
+          "Distracted": 1,
+          "Active Work": 1
+        }
+      },
+      "Distracted": {
+        "count": 1,
+        "corrections_to": {
+          "Active Work": 1
+        }
+      }
+    },
+    "correction_rate": 0.10344827586206896
+  }
+}

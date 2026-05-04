@@ -47,5 +47,21 @@
       },
       "heatmap_cells": 76
     }
+  },
+  {
+    "timestamp": "2026-05-04T22:31:27.270394",
+    "predicted": "Distracted",
+    "actual": "Idle",
+    "window_number": 30,
+    "session": 16,
+    "metadata": {
+      "is_idle": false,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 899.0102281570435
+      },
+      "heatmap_cells": 35
+    }
   }
 ]
