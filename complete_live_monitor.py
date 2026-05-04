@@ -92,6 +92,8 @@ class CompleteLiveMonitor:
         print(f"✓ Profile status: {'Loaded' if self.user_profile.baseline else 'New'}")
 
         self.stop_event = threading.Event()
+        self.ui_mode = False  # NEW: Tells backend a UI is controlling it
+        self.supervised_mode = False  # NEW: Toggled by UI
     
     def _load_model(self, path):
         """Load trained model"""
@@ -178,36 +180,20 @@ class CompleteLiveMonitor:
             print("\n\n⚠️  Monitoring stopped by user")
         finally:
             self._end_session()
-    
+
     def _process_prediction(self, current_features, metadata):
         """Make prediction and handle corrections"""
-        
-        # Prepare sequence
         sequence = np.array(list(self.feature_buffer), dtype=np.float32)
-        
-        # Normalize
         seq_flat = sequence.reshape(-1, 30)
         seq_norm = self.scaler.transform(seq_flat)
         sequence_norm = seq_norm.reshape(1, 5, 30)
-        
-        # Predict
+
         predicted_label, probabilities, confidence = self.online_learner.predict(sequence_norm)
         predicted_state = self.label_map[predicted_label]
-        
-        # Check for anomaly
         anomaly_result = self.user_profile.detect_anomaly(current_features)
-        
-        # Display prediction
-        self._display_prediction(
-            predicted_state, 
-            confidence, 
-            probabilities, 
-            current_features, 
-            metadata, 
-            anomaly_result
-        )
-        
-        # Store prediction
+
+        self._display_prediction(predicted_state, confidence, probabilities, current_features, metadata, anomaly_result)
+
         prediction_record = {
             'window': self.window_count,
             'timestamp': datetime.now().isoformat(),
@@ -217,27 +203,30 @@ class CompleteLiveMonitor:
             'metadata': metadata,
             'anomaly': anomaly_result
         }
-        
         self.session_predictions.append(prediction_record)
-        
-        # Manual correction (if enabled)
+
+        # --- UI SAFE CORRECTION LOGIC ---
         actual_state = predicted_state
-        if self.correction_mode:
+
+        # If running in terminal, do the old input() method
+        if self.correction_mode and not self.ui_mode:
             actual_state = self._ask_for_correction(predicted_state, current_features, metadata)
-        
-        # Update profile
-        actual_label = self.state_to_label[actual_state]
-        self.user_profile.add_window_data(current_features, predicted_label, actual_label)
-        
-        # If corrected, add to online learner
-        if actual_state != predicted_state:
-            self.online_learner.add_experience(sequence_norm[0], actual_label)
-            
-            # Update model if enough corrections
-            if len(self.online_learner.memory) >= 10:
-                loss = self.online_learner.update(batch_size=8, epochs=3)
-                if loss:
-                    print(f"\n   🔄 Model updated (loss: {loss:.4f})")
+            self._apply_correction_logic(current_features, predicted_label, actual_state, sequence_norm, metadata)
+
+        # If running in UI mode, we just save the state. The UI will call apply_ui_correction if needed.
+        elif self.ui_mode:
+            # We apply the default prediction. If UI corrects it later, it handles the math.
+            actual_label = self.state_to_label[actual_state]
+            self.user_profile.add_window_data(current_features, predicted_label, actual_label)
+
+            # Store latest sequence info for the UI to grab if a correction is clicked
+            self.latest_correction_data = {
+                'features': current_features,
+                'metadata': metadata,
+                'predicted_state': predicted_state,
+                'predicted_label': predicted_label,
+                'sequence_norm': sequence_norm
+            }
     
     def _display_prediction(self, state, confidence, probs, features, metadata, anomaly):
         """Display prediction results"""
@@ -506,6 +495,30 @@ def run_test_mode(duration_minutes=10):
             json.dump(predictions, f, indent=2)
         
         print(f"✓ Test results saved to {test_file}\n")
+
+    def apply_ui_correction(self, actual_state):
+        """Called safely by the UI when Supervised Mode is ON"""
+        if not hasattr(self, 'latest_correction_data') or not self.latest_correction_data:
+            return False
+
+        data = self.latest_correction_data
+        predicted_state = data['predicted_state']
+
+        if actual_state == predicted_state:
+            return False
+
+        actual_label = self.state_to_label[actual_state]
+
+        # Record correction in profile
+        self.user_profile.add_correction(predicted_state, actual_state, data['features'], data['metadata'])
+
+        # Update Neural Network via Online Learning
+        self.online_learner.add_experience(data['sequence_norm'][0], actual_label)
+        if len(self.online_learner.memory) >= 10:
+            loss = self.online_learner.update(batch_size=8, epochs=3)
+            print(f"\n   🔄 Model updated via UI (loss: {loss:.4f})")
+
+        return True
 
 
 if __name__ == "__main__":
