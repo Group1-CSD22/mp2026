@@ -1,0 +1,95 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-05T07:03:22.943503",
+  "end_time": "2026-05-05T07:10:23.371128",
+  "duration_minutes": 7,
+  "total_windows": 6,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-05T07:08:23.153064",
+      "predicted": "Distracted",
+      "confidence": 0.933806300163269,
+      "probabilities": {
+        "Deep Work": 0.00047263933811336756,
+        "Active Work": 3.0071951186982915e-05,
+        "Research": 0.0001464769011363387,
+        "Communication": 0.06532510370016098,
+        "Distracted": 0.00021942930470686406,
+        "Idle": 0.933806300163269
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 289.71752548217773,
+          "chrome.exe": 608.5264291763306
+        },
+        "heatmap_cells": 24
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      },
+      "was_corrected": true
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-05T07:10:10.217912",
+      "predicted": "Idle",
+      "confidence": 0.9995367527008057,
+      "probabilities": {
+        "Deep Work": 4.436387825990096e-06,
+        "Active Work": 1.4409484094812797e-07,
+        "Research": 5.076699835626641e-06,
+        "Communication": 0.0004502251395024359,
+        "Distracted": 3.4122767829103395e-06,
+        "Idle": 0.9995367527008057
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 590.3193302154541,
+          "chrome.exe": 608.5264291763306
+        },
+        "heatmap_cells": 11
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 22,
+    "total_windows": 43,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 9,
+    "by_predicted_state": {
+      "Idle": {
+        "count": 7,
+        "corrections_to": {
+          "Distracted": 6,
+          "Active Work": 1
+        }
+      },
+      "Distracted": {
+        "count": 2,
+        "corrections_to": {
+          "Active Work": 1,
+          "Idle": 1
+        }
+      }
+    },
+    "correction_rate": 0.20930232558139536
+  }
+}

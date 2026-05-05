@@ -1,0 +1,33 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-05T05:45:29.587901",
+  "end_time": "2026-05-05T05:45:42.103058",
+  "duration_minutes": 0,
+  "total_windows": 0,
+  "predictions": [],
+  "profile_stats": {
+    "session_number": 18,
+    "total_windows": 34,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 5,
+    "by_predicted_state": {
+      "Idle": {
+        "count": 3,
+        "corrections_to": {
+          "Distracted": 2,
+          "Active Work": 1
+        }
+      },
+      "Distracted": {
+        "count": 2,
+        "corrections_to": {
+          "Active Work": 1,
+          "Idle": 1
+        }
+      }
+    },
+    "correction_rate": 0.14705882352941177
+  }
+}

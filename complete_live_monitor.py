@@ -404,7 +404,12 @@ class CompleteLiveMonitor:
         data = self.latest_correction_data
         predicted_state = data['predicted_state']
 
-        # If user just confirms the state is correct
+        # --- CRITICAL FIX: OVERRIDE THE SESSION HISTORY ---
+        # This ensures the UI, the Pie Chart, and the JSON log lock in the CORRECTED state!
+        if len(self.session_predictions) > 0:
+            self.session_predictions[-1]['predicted'] = actual_state
+            self.session_predictions[-1]['was_corrected'] = (actual_state != predicted_state)
+
         if actual_state == predicted_state:
             print(f"✓ State confirmed as: {actual_state}")
             return True
@@ -415,7 +420,6 @@ class CompleteLiveMonitor:
         self.user_profile.add_correction(predicted_state, actual_state, data['features'], data['metadata'])
         self.online_learner.add_experience(data['sequence_norm'][0], actual_label)
 
-        # Print progress to terminal!
         current_buffer = len(self.online_learner.memory)
         print(f"✓ Correction recorded: {predicted_state} -> {actual_state} (Buffer: {current_buffer}/10)")
 
@@ -424,7 +428,6 @@ class CompleteLiveMonitor:
             print(f"\n   🔄 Model updated via UI (loss: {loss:.4f})")
 
         return True
-
 
 def run_test_mode(duration_minutes=10):
     """Run quick test with simulated data"""

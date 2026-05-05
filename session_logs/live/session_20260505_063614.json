@@ -1,0 +1,93 @@
+{
+  "user_id": "user_hari",
+  "start_time": "2026-05-05T06:29:52.135253",
+  "end_time": "2026-05-05T06:36:14.595339",
+  "duration_minutes": 6,
+  "total_windows": 6,
+  "predictions": [
+    {
+      "window": 5,
+      "timestamp": "2026-05-05T06:34:52.260361",
+      "predicted": "Distracted",
+      "confidence": 0.9997603297233582,
+      "probabilities": {
+        "Deep Work": 1.695824607850227e-06,
+        "Active Work": 3.908359147430929e-08,
+        "Research": 1.843746531449142e-06,
+        "Communication": 0.00023490277817472816,
+        "Distracted": 1.2131491757827462e-06,
+        "Idle": 0.9997603297233582
+      },
+      "metadata": {
+        "is_idle": true,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 899.1887691020966
+        },
+        "heatmap_cells": 11
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      },
+      "was_corrected": true
+    },
+    {
+      "window": 6,
+      "timestamp": "2026-05-05T06:35:56.219009",
+      "predicted": "Distracted",
+      "confidence": 0.9064184427261353,
+      "probabilities": {
+        "Deep Work": 3.234530595364049e-05,
+        "Active Work": 0.06114696338772774,
+        "Research": 0.031209437176585197,
+        "Communication": 0.0011743514332920313,
+        "Distracted": 0.9064184427261353,
+        "Idle": 1.8464737877366133e-05
+      },
+      "metadata": {
+        "is_idle": false,
+        "current_app": "python3.10.exe",
+        "app_category": "uncategorized",
+        "app_durations": {
+          "python3.10.exe": 1258.9441471099854
+        },
+        "heatmap_cells": 10
+      },
+      "anomaly": {
+        "is_anomaly": false,
+        "severity": "building_baseline",
+        "score": 0.0,
+        "anomalous_features": []
+      }
+    }
+  ],
+  "profile_stats": {
+    "session_number": 21,
+    "total_windows": 41,
+    "has_baseline": false
+  },
+  "corrections": {
+    "total_corrections": 8,
+    "by_predicted_state": {
+      "Idle": {
+        "count": 6,
+        "corrections_to": {
+          "Distracted": 5,
+          "Active Work": 1
+        }
+      },
+      "Distracted": {
+        "count": 2,
+        "corrections_to": {
+          "Active Work": 1,
+          "Idle": 1
+        }
+      }
+    },
+    "correction_rate": 0.1951219512195122
+  }
+}

@@ -63,5 +63,104 @@
       },
       "heatmap_cells": 35
     }
+  },
+  {
+    "timestamp": "2026-05-05T05:29:34.822279",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 33,
+    "session": 17,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 1251.9229755401611,
+        "pycharm64.exe": 7.128274202346802
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-05T06:09:41.933648",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 35,
+    "session": 19,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 838.3464252948761
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-05T06:19:41.082671",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 37,
+    "session": 20,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 821.3613772392273,
+        "chrome.exe": 77.70107793807983
+      },
+      "heatmap_cells": 0
+    }
+  },
+  {
+    "timestamp": "2026-05-05T06:35:56.219009",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 40,
+    "session": 21,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 899.1887691020966
+      },
+      "heatmap_cells": 11
+    }
+  },
+  {
+    "timestamp": "2026-05-05T07:10:10.202285",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 42,
+    "session": 22,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 289.71752548217773,
+        "chrome.exe": 608.5264291763306
+      },
+      "heatmap_cells": 24
+    }
+  },
+  {
+    "timestamp": "2026-05-05T07:21:17.747462",
+    "predicted": "Idle",
+    "actual": "Distracted",
+    "window_number": 44,
+    "session": 23,
+    "metadata": {
+      "is_idle": true,
+      "current_app": "python3.10.exe",
+      "app_category": "uncategorized",
+      "app_durations": {
+        "python3.10.exe": 898.3343420028687
+      },
+      "heatmap_cells": 0
+    }
   }
 ]
